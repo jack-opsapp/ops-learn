@@ -78,6 +78,8 @@ export default function CourseCurriculum({
     <div className="flex flex-col gap-4">
       {modules.map((module, moduleIdx) => {
         const isOpen = openModuleId === module.id;
+        const hasPreviewLessons = module.lessons?.some((l) => l.is_preview) ?? false;
+        const showAccessBadge = !hasAccess && !isFree;
 
         return (
           <div
@@ -102,6 +104,17 @@ export default function CourseCurriculum({
                   </p>
                 )}
               </div>
+              {showAccessBadge && (
+                hasPreviewLessons ? (
+                  <span className="shrink-0 rounded-[3px] border border-ops-accent/30 px-2.5 py-1 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+                    Preview
+                  </span>
+                ) : (
+                  <span className="shrink-0 rounded-[3px] border border-ops-border px-2.5 py-1 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
+                    Buy to Unlock
+                  </span>
+                )
+              )}
               <span className="shrink-0 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary mr-2">
                 {module.lessons?.length ?? 0} lessons
               </span>
