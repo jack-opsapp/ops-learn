@@ -9,9 +9,22 @@ function getAdminApp(): App {
     if (getApps().length > 0) {
       _adminApp = getApps()[0];
     } else {
-      _adminApp = initializeApp({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      });
+      const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+      const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+      const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+      if (privateKey && clientEmail) {
+        _adminApp = initializeApp({
+          credential: cert({
+            projectId,
+            clientEmail,
+            privateKey: privateKey.replace(/\\n/g, '\n'),
+          }),
+        });
+      } else {
+        // Fallback for build time — no credential, limited functionality
+        _adminApp = initializeApp({ projectId });
+      }
     }
   }
   return _adminApp;

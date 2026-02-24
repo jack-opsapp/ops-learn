@@ -11,6 +11,28 @@ import {
 } from '@/lib/firebase/auth';
 import type { User } from 'firebase/auth';
 
+function LoadingBars() {
+  return (
+    <div className="flex items-end justify-center gap-[3px] h-5">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="w-[3px] rounded-full bg-ops-text-primary"
+          style={{
+            animation: `loadingBar 1s ease-in-out ${i * 0.12}s infinite`,
+          }}
+        />
+      ))}
+      <style jsx>{`
+        @keyframes loadingBar {
+          0%, 100% { height: 6px; opacity: 0.4; }
+          50% { height: 20px; opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,6 +43,7 @@ export default function LoginForm() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const [navigating, setNavigating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -42,6 +65,7 @@ export default function LoginForm() {
           ? await signInWithGoogle()
           : await signInWithApple();
       await setSessionCookie(user);
+      setNavigating(true);
       router.push(next);
       router.refresh();
     } catch (err: unknown) {
@@ -62,6 +86,7 @@ export default function LoginForm() {
         ? await signUpWithEmail(email, password)
         : await signInWithEmail(email, password);
       await setSessionCookie(user);
+      setNavigating(true);
       router.push(next);
       router.refresh();
     } catch (err: unknown) {
@@ -79,6 +104,35 @@ export default function LoginForm() {
     }
 
     setLoading(false);
+  }
+
+  if (navigating) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-ops-background px-6">
+        <div className="flex flex-col items-center gap-6">
+          <div className="flex items-end justify-center gap-[3px] h-8">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="w-[4px] rounded-full bg-ops-text-primary"
+                style={{
+                  animation: `loadingBar 1s ease-in-out ${i * 0.12}s infinite`,
+                }}
+              />
+            ))}
+            <style jsx>{`
+              @keyframes loadingBar {
+                0%, 100% { height: 8px; opacity: 0.4; }
+                50% { height: 32px; opacity: 1; }
+              }
+            `}</style>
+          </div>
+          <p className="font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
+            Signing you in...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -116,7 +170,7 @@ export default function LoginForm() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            {oauthLoading === 'google' ? 'Redirecting...' : 'Continue with Google'}
+            {oauthLoading === 'google' ? <LoadingBars /> : 'Continue with Google'}
           </button>
 
           <button
@@ -127,7 +181,7 @@ export default function LoginForm() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
             </svg>
-            {oauthLoading === 'apple' ? 'Redirecting...' : 'Continue with Apple'}
+            {oauthLoading === 'apple' ? <LoadingBars /> : 'Continue with Apple'}
           </button>
         </div>
 
@@ -173,7 +227,7 @@ export default function LoginForm() {
             className="mt-2 w-full rounded-[3px] bg-ops-text-primary px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80 disabled:opacity-50"
           >
             {loading
-              ? 'Loading...'
+              ? <LoadingBars />
               : isSignUp
                 ? 'Sign Up'
                 : 'Sign In'}
