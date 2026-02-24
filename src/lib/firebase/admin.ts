@@ -24,9 +24,9 @@ function getAdminApp(): App {
     if (getApps().length > 0) {
       _adminApp = getApps()[0];
     } else {
-      const privateKey = parsePrivateKey(process.env.FIREBASE_ADMIN_PRIVATE_KEY);
-      const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-      const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+      const privateKey = parsePrivateKey(process.env.FIREBASE_ADMIN_PRIVATE_KEY?.trim());
+      const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL?.trim();
+      const projectId = (process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)?.trim();
 
       if (privateKey && clientEmail) {
         _adminApp = initializeApp({
