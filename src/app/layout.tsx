@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import SessionSync from '@/components/SessionSync';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://learn.opsapp.co'),
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-body antialiased">
+        <SessionSync />
         {children}
 
         {/* Ambient page-edge glows — matches ops-site PageLayout */}
