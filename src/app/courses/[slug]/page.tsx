@@ -3,25 +3,8 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EnrollButton from '@/components/EnrollButton';
+import CourseCurriculum from '@/components/CourseCurriculum';
 import { getCourseBySlug, getSessionUser, getUserEnrollment } from '@/lib/supabase/queries';
-
-interface Module {
-  id: string;
-  title: string;
-  description: string | null;
-  sort_order: number;
-  lessons: Lesson[];
-}
-
-interface Lesson {
-  id: string;
-  title: string;
-  slug: string;
-  description: string | null;
-  duration_minutes: number | null;
-  sort_order: number;
-  is_preview: boolean;
-}
 
 export default async function CourseDetail({
   params,
@@ -44,7 +27,7 @@ export default async function CourseDetail({
   const isFree = course.price_cents === 0;
   const totalLessons =
     course.modules?.reduce(
-      (acc: number, m: Module) => acc + (m.lessons?.length ?? 0),
+      (acc: number, m: { lessons?: unknown[] }) => acc + (m.lessons?.length ?? 0),
       0
     ) ?? 0;
 
@@ -123,66 +106,13 @@ export default async function CourseDetail({
             [ Curriculum ]
           </p>
 
-          <div className="flex flex-col gap-4">
-            {course.modules?.map((module: Module, moduleIdx: number) => (
-              <div
-                key={module.id}
-                className="overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface transition-[border-color] duration-300 hover:border-ops-border-hover"
-              >
-                {/* Module header */}
-                <div className="border-b border-ops-border px-6 py-5">
-                  <div className="flex items-center gap-4">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ops-border font-caption text-[10px] text-ops-text-secondary">
-                      {moduleIdx + 1}
-                    </span>
-                    <div className="flex-1">
-                      <h3 className="font-heading text-base font-medium text-ops-text-primary">
-                        {module.title}
-                      </h3>
-                      {module.description && (
-                        <p className="mt-0.5 font-body text-xs font-light text-ops-text-secondary">
-                          {module.description}
-                        </p>
-                      )}
-                    </div>
-                    <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
-                      {module.lessons?.length ?? 0} lessons
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lessons */}
-                <div className="divide-y divide-ops-border">
-                  {module.lessons?.map(
-                    (lesson: Lesson, lessonIdx: number) => (
-                      <Link
-                        key={lesson.id}
-                        href={`/courses/${slug}/lessons/${lesson.slug}`}
-                        className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-ops-surface-elevated"
-                      >
-                        <span className="font-caption text-[10px] text-ops-text-secondary">
-                          {moduleIdx + 1}.{lessonIdx + 1}
-                        </span>
-                        <span className="flex-1 font-body text-sm font-light text-ops-text-secondary transition-colors group-hover:text-ops-text-primary">
-                          {lesson.title}
-                        </span>
-                        {lesson.is_preview && !isFree && (
-                          <span className="rounded-[3px] border border-ops-accent/30 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
-                            Preview
-                          </span>
-                        )}
-                        {lesson.duration_minutes && (
-                          <span className="font-caption text-[10px] text-ops-text-secondary">
-                            {lesson.duration_minutes} min
-                          </span>
-                        )}
-                      </Link>
-                    )
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          <CourseCurriculum
+            modules={course.modules ?? []}
+            courseSlug={slug}
+            priceCents={course.price_cents}
+            courseId={course.id}
+            enrolled={enrolled}
+          />
         </section>
       </main>
       <Footer />
