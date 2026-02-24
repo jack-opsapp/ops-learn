@@ -4,22 +4,31 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EnrollButton from '@/components/EnrollButton';
 import CourseCurriculum from '@/components/CourseCurriculum';
-import { getCourseBySlug, getSessionUser, getUserEnrollment } from '@/lib/supabase/queries';
+import { getCourseBySlug, getSessionUser, getUserEnrollment, createPaidEnrollment } from '@/lib/supabase/queries';
 
 export default async function CourseDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ enrolled?: string }>;
 }) {
   const { slug } = await params;
+  const { enrolled: enrolledParam } = await searchParams;
   const course = await getCourseBySlug(slug);
 
   if (!course) notFound();
 
   const sessionUser = await getSessionUser();
-  const enrollment = sessionUser
+  let enrollment = sessionUser
     ? await getUserEnrollment(sessionUser.uid, course.id)
     : null;
+
+  // If redirected from Stripe checkout success and no enrollment exists yet,
+  // create it now (safety net in case webhook hasn't fired yet)
+  if (enrolledParam === 'true' && sessionUser && !enrollment) {
+    enrollment = await createPaidEnrollment(sessionUser.uid, course.id);
+  }
 
   // enrolled: null = not signed in, false = signed in but not enrolled, true = enrolled
   const enrolled = sessionUser === null ? null : enrollment !== null;

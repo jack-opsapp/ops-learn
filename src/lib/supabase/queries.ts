@@ -54,6 +54,30 @@ export async function enrollInFreeCourse(userId: string, courseId: string) {
   return data;
 }
 
+export async function createPaidEnrollment(userId: string, courseId: string) {
+  const supabase = createServiceClient();
+  const { data: existing } = await supabase
+    .from('enrollments')
+    .select('id, status')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+
+  if (existing) return existing;
+
+  const { data, error } = await supabase
+    .from('enrollments')
+    .insert({ user_id: userId, course_id: courseId, status: 'active' })
+    .select('id, status')
+    .single();
+
+  if (error) {
+    console.error('Error creating paid enrollment:', error);
+    return null;
+  }
+  return data;
+}
+
 export async function getPublishedCourses() {
   const supabase = createServiceClient();
   const { data, error } = await supabase
