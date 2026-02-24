@@ -42,8 +42,17 @@ export async function POST(request: Request) {
     }
   );
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    console.error('[checkout] Edge Function returned non-JSON:', res.status, text.slice(0, 500));
+    return NextResponse.json({ error: `Edge Function error (${res.status}): ${text.slice(0, 200)}` }, { status: 502 });
+  }
+
   if (!res.ok) {
+    console.error('[checkout] Edge Function error:', res.status, data);
     return NextResponse.json({ error: data.error || 'Checkout failed' }, { status: res.status });
   }
 
