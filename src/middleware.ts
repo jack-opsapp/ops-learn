@@ -1,13 +1,15 @@
-import { type NextRequest } from 'next/server';
-import { updateSession } from '@/lib/supabase/middleware';
+import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+const SESSION_COOKIE = 'ops-learn-session';
+
+export function middleware(request: NextRequest) {
+  // Just pass through — the session cookie is checked in server components.
+  // Middleware only ensures the cookie is forwarded properly.
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    // Match all paths except static files and images
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

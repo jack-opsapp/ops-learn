@@ -1,15 +1,26 @@
-import { createClient } from './server';
+import { cookies } from 'next/headers';
+import { createServiceClient } from './server';
+import { verifyIdToken } from '@/lib/firebase/admin';
 
-export async function getAuthUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+const SESSION_COOKIE = 'ops-learn-session';
+
+/**
+ * Get the current Firebase user from the session cookie.
+ * Returns { uid, email } or null if not signed in.
+ */
+export async function getSessionUser(): Promise<{ uid: string; email: string | undefined } | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+
+  const decoded = await verifyIdToken(token);
+  if (!decoded) return null;
+
+  return { uid: decoded.uid, email: decoded.email };
 }
 
 export async function getUserEnrollment(userId: string, courseId: string) {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data } = await supabase
     .from('enrollments')
     .select('id, status')
@@ -20,8 +31,7 @@ export async function getUserEnrollment(userId: string, courseId: string) {
 }
 
 export async function enrollInFreeCourse(userId: string, courseId: string) {
-  const supabase = await createClient();
-  // Check if already enrolled
+  const supabase = createServiceClient();
   const { data: existing } = await supabase
     .from('enrollments')
     .select('id')
@@ -45,7 +55,7 @@ export async function enrollInFreeCourse(userId: string, courseId: string) {
 }
 
 export async function getPublishedCourses() {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from('courses')
     .select(
@@ -80,7 +90,7 @@ export async function getPublishedCourses() {
 }
 
 export async function getCourseBySlug(slug: string) {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from('courses')
     .select(
@@ -119,7 +129,6 @@ export async function getCourseBySlug(slug: string) {
     return null;
   }
 
-  // Sort modules and lessons by sort_order
   if (data?.modules) {
     data.modules.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
     data.modules.forEach((m: { lessons?: { sort_order: number }[] }) => {
@@ -131,7 +140,7 @@ export async function getCourseBySlug(slug: string) {
 }
 
 export async function getContentBlocksByLessonId(lessonId: string) {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from('content_blocks')
     .select('id, type, content, sort_order')
@@ -149,9 +158,8 @@ export async function getLessonWithContent(
   courseSlug: string,
   lessonSlug: string
 ) {
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
-  // First get the course to verify it's published
   const { data: course } = await supabase
     .from('courses')
     .select('id, title, slug')
@@ -161,7 +169,6 @@ export async function getLessonWithContent(
 
   if (!course) return null;
 
-  // Get the lesson with content blocks
   const { data: lesson, error } = await supabase
     .from('lessons')
     .select(
@@ -202,7 +209,6 @@ export async function getLessonWithContent(
     return null;
   }
 
-  // Sort content blocks
   if (lesson?.content_blocks) {
     lesson.content_blocks.sort(
       (a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order

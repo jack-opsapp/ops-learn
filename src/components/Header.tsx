@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import { onAuthStateChanged, signOut } from '@/lib/firebase/auth';
+import type { User } from 'firebase/auth';
 
 export default function Header() {
   const router = useRouter();
@@ -15,18 +15,11 @@ export default function Header() {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const unsubscribe = onAuthStateChanged((u) => setUser(u));
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
@@ -69,8 +62,8 @@ export default function Header() {
           {user ? (
             <button
               onClick={async () => {
-                const supabase = createClient();
-                await supabase.auth.signOut();
+                await signOut();
+                await fetch('/api/auth/session', { method: 'DELETE' });
                 router.push('/');
                 router.refresh();
               }}

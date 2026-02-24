@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EnrollButton from '@/components/EnrollButton';
-import { getCourseBySlug, getAuthUser, getUserEnrollment } from '@/lib/supabase/queries';
+import { getCourseBySlug, getSessionUser, getUserEnrollment } from '@/lib/supabase/queries';
 
 interface Module {
   id: string;
@@ -33,13 +33,13 @@ export default async function CourseDetail({
 
   if (!course) notFound();
 
-  const user = await getAuthUser();
-  const enrollment = user
-    ? await getUserEnrollment(user.id, course.id)
+  const sessionUser = await getSessionUser();
+  const enrollment = sessionUser
+    ? await getUserEnrollment(sessionUser.uid, course.id)
     : null;
 
   // enrolled: null = not signed in, false = signed in but not enrolled, true = enrolled
-  const enrolled = user === null ? null : enrollment !== null;
+  const enrolled = sessionUser === null ? null : enrollment !== null;
 
   const isFree = course.price_cents === 0;
   const totalLessons =

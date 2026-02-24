@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import {
+  signInWithGoogle,
+  signInWithApple,
+  signInWithEmail,
+  signUpWithEmail,
+} from '@/lib/firebase/auth';
+import type { User } from 'firebase/auth';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -18,20 +24,29 @@ export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  async function setSessionCookie(user: User) {
+    const idToken = await user.getIdToken();
+    await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+  }
+
   async function handleOAuth(provider: 'google' | 'apple') {
     setOauthLoading(provider);
     setError(null);
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
+    try {
+      const user =
+        provider === 'google'
+          ? await signInWithGoogle()
+          : await signInWithApple();
+      await setSessionCookie(user);
+      router.push(next);
+      router.refresh();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Sign in failed';
+      setError(msg);
       setOauthLoading(null);
     }
   }
@@ -42,31 +57,24 @@ export default function LoginForm() {
     setError(null);
     setMessage(null);
 
-    const supabase = createClient();
-
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        },
-      });
-      if (error) {
-        setError(error.message);
+    try {
+      const user = isSignUp
+        ? await signUpWithEmail(email, password)
+        : await signInWithEmail(email, password);
+      await setSessionCookie(user);
+      router.push(next);
+      router.refresh();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Sign in failed';
+      // Clean up Firebase error messages
+      if (msg.includes('auth/invalid-credential') || msg.includes('auth/wrong-password')) {
+        setError('Invalid email or password.');
+      } else if (msg.includes('auth/email-already-in-use')) {
+        setError('An account with this email already exists. Try signing in.');
+      } else if (msg.includes('auth/weak-password')) {
+        setError('Password must be at least 6 characters.');
       } else {
-        setMessage('Check your email for a confirmation link.');
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        setError(error.message);
-      } else {
-        router.push(next);
-        router.refresh();
+        setError(msg);
       }
     }
 

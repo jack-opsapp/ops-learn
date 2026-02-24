@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 
 interface EnrollButtonProps {
   courseId: string;
@@ -20,7 +18,6 @@ export default function EnrollButton({
   priceCents,
   enrolled,
 }: EnrollButtonProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isFree = priceCents === 0;
@@ -67,25 +64,23 @@ export default function EnrollButton({
     );
   }
 
-  // Signed in, paid course, not enrolled — buy
+  // Signed in, paid course, not enrolled — buy via API route
   async function handleBuy() {
     setLoading(true);
     setError(null);
     try {
-      const supabase = createClient();
-      const { data, error: fnError } = await supabase.functions.invoke(
-        'stripe-create-checkout-session',
-        {
-          body: {
-            type: 'course_purchase',
-            courseId,
-            successUrl: `${window.location.origin}/courses/${courseSlug}?enrolled=true`,
-            cancelUrl: `${window.location.origin}/courses/${courseSlug}`,
-          },
-        }
-      );
-      if (fnError) throw fnError;
-      if (data?.url) {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseId,
+          successUrl: `${window.location.origin}/courses/${courseSlug}?enrolled=true`,
+          cancelUrl: `${window.location.origin}/courses/${courseSlug}`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed');
+      if (data.url) {
         window.location.href = data.url;
       } else {
         throw new Error('No checkout URL returned');

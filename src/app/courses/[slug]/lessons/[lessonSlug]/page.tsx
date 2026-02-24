@@ -4,7 +4,7 @@ import LessonPlayer from '@/components/LessonPlayer';
 import {
   getCourseBySlug,
   getContentBlocksByLessonId,
-  getAuthUser,
+  getSessionUser,
   getUserEnrollment,
   enrollInFreeCourse,
 } from '@/lib/supabase/queries';
@@ -40,8 +40,8 @@ export default async function LessonPage({
   const { slug, lessonSlug } = await params;
 
   // Auth gate: require sign-in for all lessons
-  const user = await getAuthUser();
-  if (!user) {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
     redirect(`/auth/login?next=/courses/${slug}/lessons/${lessonSlug}`);
   }
 
@@ -59,12 +59,12 @@ export default async function LessonPage({
   if (!targetLesson) notFound();
 
   // Enrollment check
-  let enrollment = await getUserEnrollment(user.id, course.id);
+  let enrollment = await getUserEnrollment(sessionUser.uid, course.id);
 
   if (!enrollment) {
     if (isFree) {
       // Auto-enroll in free courses
-      await enrollInFreeCourse(user.id, course.id);
+      await enrollInFreeCourse(sessionUser.uid, course.id);
     } else if (!targetLesson.is_preview) {
       // Paid course, not enrolled, not a preview lesson → redirect to course page
       redirect(`/courses/${slug}`);
