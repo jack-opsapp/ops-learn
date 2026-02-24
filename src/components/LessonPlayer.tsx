@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
+import AssignmentBlock from './AssignmentBlock';
 
 interface ContentBlock {
   id: string;
@@ -22,6 +23,7 @@ interface LessonPlayerProps {
   courseSlug: string;
   prevLesson: { slug: string; title: string } | null;
   nextLesson: { slug: string; title: string } | null;
+  userId?: string;
 }
 
 function sanitizeHtml(html: string): string {
@@ -34,7 +36,7 @@ function sanitizeHtml(html: string): string {
   });
 }
 
-function ContentBlockRenderer({ block }: { block: ContentBlock }) {
+function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?: string }) {
   const content = block.content as Record<string, string>;
 
   switch (block.type) {
@@ -139,6 +141,27 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
         </div>
       );
 
+    case 'assignment': {
+      // Strip sensitive fields (correct_answer, rubric) before sending to client
+      const raw = block.content as Record<string, unknown>;
+      const questions = (
+        (raw.questions as Array<Record<string, unknown>>) ?? []
+      ).map((q) => {
+        const { correct_answer, rubric, ...safeQ } = q;
+        return safeQ;
+      });
+      const safeContent = { ...raw, questions };
+
+      return (
+        <AssignmentBlock
+          blockId={block.id}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          content={safeContent as any}
+          userId={userId ?? ''}
+        />
+      );
+    }
+
     default:
       return null;
   }
@@ -150,6 +173,7 @@ export default function LessonPlayer({
   courseSlug,
   prevLesson,
   nextLesson,
+  userId,
 }: LessonPlayerProps) {
   return (
     <div className="flex-1 overflow-y-auto">
@@ -176,7 +200,7 @@ export default function LessonPlayer({
         <div className="flex flex-col gap-10">
           {lesson.content_blocks && lesson.content_blocks.length > 0 ? (
             lesson.content_blocks.map((block) => (
-              <ContentBlockRenderer key={block.id} block={block} />
+              <ContentBlockRenderer key={block.id} block={block} userId={userId} />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center border border-dashed border-ops-border py-20 text-center rounded-[3px]">

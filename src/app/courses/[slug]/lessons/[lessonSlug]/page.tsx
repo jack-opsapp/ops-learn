@@ -229,6 +229,7 @@ export default async function LessonPage({
           courseSlug={slug}
           prevLesson={prevLesson}
           nextLesson={nextLesson}
+          userId={sessionUser.uid}
         />
       </div>
     </div>
