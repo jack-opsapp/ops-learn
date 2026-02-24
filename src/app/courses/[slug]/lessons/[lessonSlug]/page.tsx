@@ -1,7 +1,13 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import LessonPlayer from '@/components/LessonPlayer';
-import { getCourseBySlug } from '@/lib/supabase/queries';
+import {
+  getCourseBySlug,
+  getContentBlocksByLessonId,
+  getAuthUser,
+  getUserEnrollment,
+  enrollInFreeCourse,
+} from '@/lib/supabase/queries';
 
 interface Module {
   id: string;
@@ -32,9 +38,38 @@ export default async function LessonPage({
   params: Promise<{ slug: string; lessonSlug: string }>;
 }) {
   const { slug, lessonSlug } = await params;
-  const course = await getCourseBySlug(slug);
 
+  // Auth gate: require sign-in for all lessons
+  const user = await getAuthUser();
+  if (!user) {
+    redirect(`/auth/login?next=/courses/${slug}/lessons/${lessonSlug}`);
+  }
+
+  const course = await getCourseBySlug(slug);
   if (!course) notFound();
+
+  const isFree = course.price_cents === 0;
+
+  // Find the lesson to check is_preview before enrollment check
+  const allLessonsFlat: Lesson[] = [];
+  course.modules?.forEach((m: Module) => {
+    m.lessons?.forEach((l: Lesson) => allLessonsFlat.push(l));
+  });
+  const targetLesson = allLessonsFlat.find((l) => l.slug === lessonSlug);
+  if (!targetLesson) notFound();
+
+  // Enrollment check
+  let enrollment = await getUserEnrollment(user.id, course.id);
+
+  if (!enrollment) {
+    if (isFree) {
+      // Auto-enroll in free courses
+      await enrollInFreeCourse(user.id, course.id);
+    } else if (!targetLesson.is_preview) {
+      // Paid course, not enrolled, not a preview lesson → redirect to course page
+      redirect(`/courses/${slug}`);
+    }
+  }
 
   let currentLesson: (Lesson & { content_blocks?: ContentBlock[] }) | null =
     null;
@@ -54,8 +89,11 @@ export default async function LessonPage({
   );
   if (currentIdx === -1) notFound();
 
-  currentLesson = allLessons[currentIdx].lesson;
   currentModule = allLessons[currentIdx].module;
+
+  // Fetch content blocks for the current lesson
+  const contentBlocks = await getContentBlocksByLessonId(allLessons[currentIdx].lesson.id);
+  currentLesson = { ...allLessons[currentIdx].lesson, content_blocks: contentBlocks };
 
   if (currentIdx > 0) {
     prevLesson = {

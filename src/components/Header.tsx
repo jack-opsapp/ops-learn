@@ -2,14 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function Header() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -48,14 +66,26 @@ export default function Header() {
           >
             Courses
           </Link>
-          <a
-            href="https://opsapp.co"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-transparent text-ops-text-primary border border-ops-border hover:border-ops-border-hover active:border-white/40"
-          >
-            GET OPS
-          </a>
+          {user ? (
+            <button
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                router.push('/');
+                router.refresh();
+              }}
+              className="inline-flex items-center justify-center font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-transparent text-ops-text-primary border border-ops-border hover:border-ops-border-hover active:border-white/40"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center justify-center font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-transparent text-ops-text-primary border border-ops-border hover:border-ops-border-hover active:border-white/40"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>

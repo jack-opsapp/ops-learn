@@ -1,5 +1,49 @@
 import { createClient } from './server';
 
+export async function getAuthUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+}
+
+export async function getUserEnrollment(userId: string, courseId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('enrollments')
+    .select('id, status')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+  return data;
+}
+
+export async function enrollInFreeCourse(userId: string, courseId: string) {
+  const supabase = await createClient();
+  // Check if already enrolled
+  const { data: existing } = await supabase
+    .from('enrollments')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+
+  if (existing) return existing;
+
+  const { data, error } = await supabase
+    .from('enrollments')
+    .insert({ user_id: userId, course_id: courseId, status: 'active' })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Error enrolling in free course:', error);
+    return null;
+  }
+  return data;
+}
+
 export async function getPublishedCourses() {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -84,6 +128,21 @@ export async function getCourseBySlug(slug: string) {
   }
 
   return data;
+}
+
+export async function getContentBlocksByLessonId(lessonId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('content_blocks')
+    .select('id, type, content, sort_order')
+    .eq('lesson_id', lessonId)
+    .order('sort_order');
+
+  if (error) {
+    console.error('Error fetching content blocks:', error);
+    return [];
+  }
+  return data ?? [];
 }
 
 export async function getLessonWithContent(

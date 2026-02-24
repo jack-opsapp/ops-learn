@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getCourseBySlug } from '@/lib/supabase/queries';
+import EnrollButton from '@/components/EnrollButton';
+import { getCourseBySlug, getAuthUser, getUserEnrollment } from '@/lib/supabase/queries';
 
 interface Module {
   id: string;
@@ -31,6 +32,14 @@ export default async function CourseDetail({
   const course = await getCourseBySlug(slug);
 
   if (!course) notFound();
+
+  const user = await getAuthUser();
+  const enrollment = user
+    ? await getUserEnrollment(user.id, course.id)
+    : null;
+
+  // enrolled: null = not signed in, false = signed in but not enrolled, true = enrolled
+  const enrolled = user === null ? null : enrollment !== null;
 
   const isFree = course.price_cents === 0;
   const totalLessons =
@@ -94,29 +103,16 @@ export default async function CourseDetail({
                 )}
               </div>
 
-              {/* Start button — solid variant matching ops-site */}
-              {course.modules?.[0]?.lessons?.[0] && (
-                <Link
-                  href={`/courses/${slug}/lessons/${course.modules[0].lessons[0].slug}`}
-                  className="mt-8 inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-text-primary px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80"
-                >
-                  Start Course
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M6 3L11 8L6 13"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </Link>
-              )}
+              {/* CTA — enrollment-aware */}
+              <div className="mt-8">
+                <EnrollButton
+                  courseId={course.id}
+                  courseSlug={slug}
+                  firstLessonSlug={course.modules?.[0]?.lessons?.[0]?.slug ?? null}
+                  priceCents={course.price_cents}
+                  enrolled={enrolled}
+                />
+              </div>
             </div>
           </div>
         </section>
