@@ -20,8 +20,8 @@ export async function POST(request: Request) {
   const { courseId, successUrl, cancelUrl } = await request.json();
 
   // Call the Edge Function with the service role key
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
   const res = await fetch(
     `${supabaseUrl}/functions/v1/stripe-create-checkout-session`,
