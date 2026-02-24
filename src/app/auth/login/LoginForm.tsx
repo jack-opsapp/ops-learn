@@ -49,11 +49,15 @@ export default function LoginForm() {
 
   async function setSessionCookie(user: User) {
     const idToken = await user.getIdToken();
-    await fetch('/api/auth/session', {
+    const res = await fetch('/api/auth/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idToken }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to create session');
+    }
   }
 
   async function handleOAuth(provider: 'google' | 'apple') {

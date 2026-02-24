@@ -12,8 +12,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing idToken' }, { status: 400 });
   }
 
-  const decoded = await verifyIdToken(idToken);
+  let decoded;
+  try {
+    decoded = await verifyIdToken(idToken);
+  } catch (err) {
+    console.error('[session] verifyIdToken threw:', err);
+    return NextResponse.json({ error: 'Token verification failed' }, { status: 401 });
+  }
+
   if (!decoded) {
+    console.error('[session] verifyIdToken returned null — check FIREBASE_ADMIN_PRIVATE_KEY, FIREBASE_ADMIN_CLIENT_EMAIL, FIREBASE_ADMIN_PROJECT_ID env vars');
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 

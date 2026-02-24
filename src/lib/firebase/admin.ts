@@ -14,6 +14,7 @@ function getAdminApp(): App {
       const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
       if (privateKey && clientEmail) {
+        console.log('[firebase-admin] Initializing with service account credentials');
         _adminApp = initializeApp({
           credential: cert({
             projectId,
@@ -22,7 +23,7 @@ function getAdminApp(): App {
           }),
         });
       } else {
-        // Fallback for build time — no credential, limited functionality
+        console.warn('[firebase-admin] No credentials — privateKey:', !!privateKey, 'clientEmail:', !!clientEmail);
         _adminApp = initializeApp({ projectId });
       }
     }
@@ -44,7 +45,8 @@ function getAdminAuth(): Auth {
 export async function verifyIdToken(token: string) {
   try {
     return await getAdminAuth().verifyIdToken(token);
-  } catch {
+  } catch (err) {
+    console.error('[firebase-admin] verifyIdToken error:', err);
     return null;
   }
 }
