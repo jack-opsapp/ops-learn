@@ -122,7 +122,7 @@ export default function Header() {
                       OPS DASHBOARD
                     </a>
                     <Link
-                      href="/"
+                      href="/my-courses"
                       onClick={() => setDropdownOpen(false)}
                       className="block px-4 py-2.5 font-caption text-ops-text-secondary uppercase tracking-[0.1em] text-[11px] hover:bg-ops-surface-elevated hover:text-ops-text-primary transition-colors"
                     >
