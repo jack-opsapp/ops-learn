@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Colors */
+  --color-ops-background: #0A0A0A;
+  --color-ops-surface: #0D0D0D;
+  --color-ops-surface-elevated: #141414;
+  --color-ops-surface-hover: #1A1A1A;
+  --color-ops-text-primary: #FFFFFF;
+  --color-ops-text-secondary: #999999;
+  --color-ops-text-tertiary: #666666;
+  --color-ops-accent: #597794;
+  --color-ops-accent-hover: #6B8DAB;
+  --color-ops-border: rgba(255, 255, 255, 0.10);
+  --color-ops-border-hover: rgba(255, 255, 255, 0.25);
+  --color-ops-success: #A5B368;
+  --color-ops-warning: #C4A868;
+  --color-ops-error: #93321A;
+
+  /* Fonts */
+  --font-heading: 'Mohave', sans-serif;
+  --font-body: 'Mohave', sans-serif;
+  --font-caption: 'Kosugi', sans-serif;
+
+  /* Radius */
+  --radius-ops-sm: 2px;
+  --radius-ops-md: 3px;
+  --radius-ops-lg: 5px;
+  --radius-ops-xl: 8px;
+  --radius-ops-2xl: 12px;
+
+  /* 8pt grid spacing */
+  --spacing-ops-xs: 4px;
+  --spacing-ops-sm: 8px;
+  --spacing-ops-md: 16px;
+  --spacing-ops-lg: 24px;
+  --spacing-ops-xl: 32px;
+  --spacing-ops-2xl: 48px;
+  --spacing-ops-3xl: 64px;
+  --spacing-ops-4xl: 96px;
+
+  /* Animations */
+  --animate-fade-in: fadeIn 0.3s ease-out forwards;
+  --animate-fade-up: fadeUp 0.5s ease-out forwards;
+  --animate-slide-up: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Fonts */
+@font-face {
+  font-family: 'Mohave';
+  src: url('/fonts/Mohave-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: url('/fonts/Mohave-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: url('/fonts/Mohave-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: url('/fonts/Mohave-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mohave';
+  src: url('/fonts/Mohave-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kosugi';
+  src: url('/fonts/Kosugi-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Base */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Mohave', sans-serif;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Selection */
+::selection {
+  background: rgba(89, 119, 148, 0.4);
+  color: #FFFFFF;
+}
+
+/* Autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0D0D0D inset;
+  -webkit-text-fill-color: #FFFFFF;
+  caret-color: #FFFFFF;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
