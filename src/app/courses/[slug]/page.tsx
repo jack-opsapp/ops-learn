@@ -75,7 +75,11 @@ export default async function CourseDetail({
 
               {/* Meta bar */}
               <div className="mt-6 flex flex-wrap items-center gap-4 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
-                {isFree ? (
+                {enrolled === true && !isFree ? (
+                  <span className="rounded-[3px] bg-emerald-500/10 px-3 py-1 text-emerald-400">
+                    Paid
+                  </span>
+                ) : isFree ? (
                   <span className="rounded-[3px] bg-ops-accent/10 px-3 py-1 text-ops-accent">
                     Free
                   </span>
