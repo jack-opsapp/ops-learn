@@ -10,20 +10,18 @@ export default function ProgressBar({
   showLabel = false,
 }: ProgressBarProps) {
   const clampedPercent = Math.min(100, Math.max(0, percent));
-  const height = size === 'sm' ? 'h-1' : 'h-2';
+  const heightClass = size === 'sm' ? 'h-[2px]' : 'h-1';
 
   return (
-    <div className="flex items-center gap-2">
-      <div
-        className={`${height} w-full overflow-hidden rounded-full bg-ops-border`}
-      >
+    <div className="flex items-center gap-3">
+      <div className={`flex-1 overflow-hidden rounded-full bg-ops-border ${heightClass}`}>
         <div
-          className={`${height} rounded-full bg-ops-accent transition-all duration-500`}
+          className={`${heightClass} rounded-full bg-ops-accent transition-all duration-500`}
           style={{ width: `${clampedPercent}%` }}
         />
       </div>
       {showLabel && (
-        <span className="shrink-0 font-caption text-xs text-ops-text-tertiary">
+        <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
           {Math.round(clampedPercent)}%
         </span>
       )}

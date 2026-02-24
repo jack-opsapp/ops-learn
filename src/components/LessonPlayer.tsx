@@ -40,7 +40,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
   switch (block.type) {
     case 'video':
       return (
-        <div className="aspect-video w-full overflow-hidden rounded-ops-xl bg-ops-surface-elevated">
+        <div className="aspect-video w-full overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface">
           {content.url ? (
             <video
               src={content.url}
@@ -63,7 +63,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="font-caption text-sm text-ops-text-tertiary">
+              <span className="font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
                 Video coming soon
               </span>
             </div>
@@ -73,7 +73,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
 
     case 'text':
       return (
-        <div className="prose prose-invert max-w-none font-body text-ops-text-secondary [&_h2]:font-heading [&_h2]:text-ops-text-primary [&_h3]:font-heading [&_h3]:text-ops-text-primary [&_strong]:text-ops-text-primary [&_a]:text-ops-accent">
+        <div className="prose-ops max-w-none">
           <div
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(content.html ?? ''),
@@ -87,16 +87,16 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
         <a
           href={content.url}
           download
-          className="flex items-center gap-3 rounded-ops-xl border border-ops-border bg-ops-surface p-4 transition-colors hover:border-ops-accent hover:bg-ops-surface-elevated"
+          className="group flex items-center gap-4 rounded-[3px] border border-ops-border bg-ops-surface p-5 transition-[border-color] duration-300 hover:border-ops-border-hover"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-ops-lg bg-ops-accent/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] bg-ops-accent/10">
             <svg
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1.5"
               className="text-ops-accent"
             >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -105,10 +105,10 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             </svg>
           </div>
           <div>
-            <p className="font-heading text-sm font-semibold text-ops-text-primary">
+            <p className="font-heading text-sm font-medium text-ops-text-primary">
               {content.title ?? 'Download'}
             </p>
-            <p className="font-caption text-xs text-ops-text-tertiary">
+            <p className="mt-0.5 font-body text-xs font-light text-ops-text-secondary">
               {content.description ?? 'Click to download'}
             </p>
           </div>
@@ -117,25 +117,11 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
 
     case 'action_item':
       return (
-        <div className="rounded-ops-xl border border-ops-accent/20 bg-ops-accent/5 p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-ops-accent"
-            >
-              <polyline points="9 11 12 14 22 4" />
-              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-            </svg>
-            <span className="font-caption text-xs font-medium uppercase tracking-wider text-ops-accent">
-              Action Item
-            </span>
-          </div>
-          <p className="font-body text-sm leading-relaxed text-ops-text-primary">
+        <div className="rounded-[3px] border-l-2 border-ops-accent bg-ops-surface p-5">
+          <p className="mb-1.5 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-accent">
+            Action Item
+          </p>
+          <p className="font-body text-sm font-light leading-relaxed text-ops-text-primary">
             {content.text}
           </p>
         </div>
@@ -143,11 +129,11 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
 
     case 'quiz':
       return (
-        <div className="rounded-ops-xl border border-ops-border bg-ops-surface p-5">
-          <span className="font-caption text-xs font-medium uppercase tracking-wider text-ops-warning">
+        <div className="rounded-[3px] border border-ops-border bg-ops-surface p-5">
+          <p className="mb-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-warning">
             Quick Check
-          </span>
-          <p className="mt-2 font-body text-sm text-ops-text-primary">
+          </p>
+          <p className="font-body text-sm font-light text-ops-text-primary">
             {content.question}
           </p>
         </div>
@@ -167,34 +153,37 @@ export default function LessonPlayer({
 }: LessonPlayerProps) {
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-12">
+      <div className="mx-auto max-w-3xl px-6 py-12 md:px-10 lg:py-16">
         {/* Lesson header */}
-        <div className="mb-8">
-          <p className="font-caption text-xs text-ops-text-tertiary">
+        <div className="mb-10">
+          <p className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
             {moduleName}
           </p>
-          <h1 className="mt-1 font-heading text-2xl font-bold text-ops-text-primary sm:text-3xl">
+          <h1
+            className="mt-2 font-heading font-bold text-ops-text-primary"
+            style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}
+          >
             {lesson.title}
           </h1>
           {lesson.duration_minutes && (
-            <p className="mt-2 font-caption text-xs text-ops-text-tertiary">
+            <p className="mt-2 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
               {lesson.duration_minutes} min
             </p>
           )}
         </div>
 
         {/* Content blocks */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-10">
           {lesson.content_blocks && lesson.content_blocks.length > 0 ? (
             lesson.content_blocks.map((block) => (
               <ContentBlockRenderer key={block.id} block={block} />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-ops-xl border border-dashed border-ops-border py-16 text-center">
-              <span className="font-heading text-3xl text-ops-accent/20">
+            <div className="flex flex-col items-center justify-center border border-dashed border-ops-border py-20 text-center rounded-[3px]">
+              <span className="font-heading text-3xl font-bold text-white/[0.06]">
                 OPS
               </span>
-              <p className="mt-3 font-caption text-sm text-ops-text-tertiary">
+              <p className="mt-3 font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
                 Content coming soon
               </p>
             </div>
@@ -202,26 +191,26 @@ export default function LessonPlayer({
         </div>
 
         {/* Navigation */}
-        <div className="mt-12 flex items-center justify-between border-t border-ops-border pt-6">
+        <div className="mt-16 flex items-center justify-between border-t border-ops-border pt-8">
           {prevLesson ? (
             <Link
               href={`/courses/${courseSlug}/lessons/${prevLesson.slug}`}
-              className="group flex items-center gap-2 text-ops-text-secondary transition-colors hover:text-ops-accent"
+              className="group flex items-center gap-3 text-ops-text-secondary transition-colors hover:text-ops-text-primary"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path
                   d="M10 13L5 8L10 3"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
               <div className="text-left">
-                <p className="font-caption text-[10px] text-ops-text-tertiary">
+                <p className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
                   Previous
                 </p>
-                <p className="font-body text-sm">{prevLesson.title}</p>
+                <p className="font-body text-sm font-light">{prevLesson.title}</p>
               </div>
             </Link>
           ) : (
@@ -231,19 +220,19 @@ export default function LessonPlayer({
           {nextLesson ? (
             <Link
               href={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}
-              className="group flex items-center gap-2 text-ops-text-secondary transition-colors hover:text-ops-accent"
+              className="group flex items-center gap-3 text-ops-text-secondary transition-colors hover:text-ops-text-primary"
             >
               <div className="text-right">
-                <p className="font-caption text-[10px] text-ops-text-tertiary">
+                <p className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
                   Next
                 </p>
-                <p className="font-body text-sm">{nextLesson.title}</p>
+                <p className="font-body text-sm font-light">{nextLesson.title}</p>
               </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path
                   d="M6 3L11 8L6 13"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -252,14 +241,14 @@ export default function LessonPlayer({
           ) : (
             <Link
               href={`/courses/${courseSlug}`}
-              className="flex items-center gap-2 rounded-ops-lg bg-ops-success/10 px-4 py-2 font-caption text-sm text-ops-success transition-colors hover:bg-ops-success/20"
+              className="inline-flex items-center justify-center gap-2 font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-ops-text-primary text-ops-background hover:bg-white/90 active:bg-white/80"
             >
               Course Complete
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <polyline
                   points="9 11 12 14 22 4"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                 />
               </svg>
             </Link>

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { getCourseBySlug } from '@/lib/supabase/queries';
 
 interface Module {
@@ -41,111 +42,114 @@ export default async function CourseDetail({
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-4xl px-4 pt-24 pb-16 sm:px-6">
-        {/* Breadcrumb */}
-        <nav className="mb-6 font-caption text-sm text-ops-text-tertiary">
-          <Link href="/" className="transition-colors hover:text-ops-accent">
-            Courses
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-ops-text-secondary">{course.title}</span>
-        </nav>
+      <main className="relative z-10">
+        {/* Hero area */}
+        <section className="relative px-6 pt-28 pb-12 md:px-10 lg:px-24">
+          {/* Gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f] via-ops-background to-ops-background" />
 
-        {/* Course Header */}
-        <section className="mb-12">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h1 className="font-heading text-3xl font-bold text-ops-text-primary sm:text-4xl">
+          <div className="relative mx-auto max-w-[1400px]">
+            {/* Breadcrumb */}
+            <nav className="mb-8">
+              <div className="flex items-center gap-2 font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
+                <Link href="/" className="transition-colors hover:text-ops-text-primary">
+                  Courses
+                </Link>
+                <span>/</span>
+                <span className="text-ops-text-primary">{course.title}</span>
+              </div>
+            </nav>
+
+            {/* Course header */}
+            <div className="max-w-2xl">
+              <h1
+                className="font-heading font-bold uppercase text-ops-text-primary"
+                style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', lineHeight: 1.1 }}
+              >
                 {course.title}
               </h1>
-              <p className="mt-3 max-w-2xl font-body text-lg leading-relaxed text-ops-text-secondary">
+              <p className="mt-4 font-body text-lg font-light leading-relaxed text-ops-text-secondary">
                 {course.description}
               </p>
+
+              {/* Meta bar */}
+              <div className="mt-6 flex flex-wrap items-center gap-4 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+                {isFree ? (
+                  <span className="rounded-[3px] bg-ops-accent/10 px-3 py-1 text-ops-accent">
+                    Free
+                  </span>
+                ) : (
+                  <span className="rounded-[3px] bg-ops-accent/10 px-3 py-1 text-ops-accent">
+                    ${(course.price_cents / 100).toFixed(0)}
+                  </span>
+                )}
+                <span>{course.modules?.length ?? 0} modules</span>
+                <span className="text-ops-border">|</span>
+                <span>{totalLessons} lessons</span>
+                {course.estimated_duration_minutes && (
+                  <>
+                    <span className="text-ops-border">|</span>
+                    <span>{course.estimated_duration_minutes} min total</span>
+                  </>
+                )}
+              </div>
+
+              {/* Start button — solid variant matching ops-site */}
+              {course.modules?.[0]?.lessons?.[0] && (
+                <Link
+                  href={`/courses/${slug}/lessons/${course.modules[0].lessons[0].slug}`}
+                  className="mt-8 inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-text-primary px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80"
+                >
+                  Start Course
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                  >
+                    <path
+                      d="M6 3L11 8L6 13"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Link>
+              )}
             </div>
           </div>
-
-          {/* Meta bar */}
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            {isFree ? (
-              <span className="rounded-ops-lg bg-ops-success/10 px-3 py-1 font-caption text-sm font-medium text-ops-success">
-                FREE
-              </span>
-            ) : (
-              <span className="rounded-ops-lg bg-ops-accent/10 px-3 py-1 font-caption text-sm text-ops-accent">
-                ${(course.price_cents / 100).toFixed(0)}
-              </span>
-            )}
-            <span className="font-caption text-sm text-ops-text-tertiary">
-              {course.modules?.length ?? 0} modules
-            </span>
-            <span className="text-ops-border">|</span>
-            <span className="font-caption text-sm text-ops-text-tertiary">
-              {totalLessons} lessons
-            </span>
-            {course.estimated_duration_minutes && (
-              <>
-                <span className="text-ops-border">|</span>
-                <span className="font-caption text-sm text-ops-text-tertiary">
-                  {course.estimated_duration_minutes} min total
-                </span>
-              </>
-            )}
-          </div>
-
-          {/* Start button */}
-          {course.modules?.[0]?.lessons?.[0] && (
-            <Link
-              href={`/courses/${slug}/lessons/${course.modules[0].lessons[0].slug}`}
-              className="mt-8 inline-flex items-center gap-2 rounded-ops-lg bg-ops-accent px-6 py-3 font-heading text-base font-semibold text-white transition-colors hover:bg-ops-accent-hover"
-            >
-              Start Course
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                className="ml-1"
-              >
-                <path
-                  d="M6 3L11 8L6 13"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
-          )}
         </section>
 
         {/* Curriculum */}
-        <section>
-          <h2 className="mb-6 font-heading text-2xl font-semibold text-ops-text-primary">
-            Curriculum
-          </h2>
+        <section className="mx-auto max-w-[1400px] px-6 py-12 md:px-10">
+          <p className="mb-8 font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
+            [ Curriculum ]
+          </p>
+
           <div className="flex flex-col gap-4">
             {course.modules?.map((module: Module, moduleIdx: number) => (
               <div
                 key={module.id}
-                className="overflow-hidden rounded-ops-xl border border-ops-border bg-ops-surface"
+                className="overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface transition-[border-color] duration-300 hover:border-ops-border-hover"
               >
                 {/* Module header */}
-                <div className="border-b border-ops-border px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ops-accent/10 font-caption text-xs font-medium text-ops-accent">
+                <div className="border-b border-ops-border px-6 py-5">
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ops-border font-caption text-[10px] text-ops-text-secondary">
                       {moduleIdx + 1}
                     </span>
-                    <div>
-                      <h3 className="font-heading text-base font-semibold text-ops-text-primary">
+                    <div className="flex-1">
+                      <h3 className="font-heading text-base font-medium text-ops-text-primary">
                         {module.title}
                       </h3>
                       {module.description && (
-                        <p className="mt-0.5 font-caption text-xs text-ops-text-tertiary">
+                        <p className="mt-0.5 font-body text-xs font-light text-ops-text-secondary">
                           {module.description}
                         </p>
                       )}
                     </div>
-                    <span className="ml-auto font-caption text-xs text-ops-text-tertiary">
+                    <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
                       {module.lessons?.length ?? 0} lessons
                     </span>
                   </div>
@@ -158,23 +162,21 @@ export default async function CourseDetail({
                       <Link
                         key={lesson.id}
                         href={`/courses/${slug}/lessons/${lesson.slug}`}
-                        className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-ops-surface-hover"
+                        className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-ops-surface-elevated"
                       >
-                        <span className="font-caption text-xs text-ops-text-tertiary">
+                        <span className="font-caption text-[10px] text-ops-text-secondary">
                           {moduleIdx + 1}.{lessonIdx + 1}
                         </span>
-                        <div className="flex-1">
-                          <span className="font-body text-sm text-ops-text-primary group-hover:text-ops-accent">
-                            {lesson.title}
-                          </span>
-                        </div>
+                        <span className="flex-1 font-body text-sm font-light text-ops-text-secondary transition-colors group-hover:text-ops-text-primary">
+                          {lesson.title}
+                        </span>
                         {lesson.is_preview && !isFree && (
-                          <span className="rounded-ops-lg bg-ops-success/10 px-2 py-0.5 font-caption text-[10px] text-ops-success">
-                            PREVIEW
+                          <span className="rounded-[3px] border border-ops-accent/30 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+                            Preview
                           </span>
                         )}
                         {lesson.duration_minutes && (
-                          <span className="font-caption text-xs text-ops-text-tertiary">
+                          <span className="font-caption text-[10px] text-ops-text-secondary">
                             {lesson.duration_minutes} min
                           </span>
                         )}
@@ -187,6 +189,7 @@ export default async function CourseDetail({
           </div>
         </section>
       </main>
+      <Footer />
     </>
   );
 }

@@ -36,14 +36,12 @@ export default async function LessonPage({
 
   if (!course) notFound();
 
-  // Find the current lesson in the course structure
   let currentLesson: (Lesson & { content_blocks?: ContentBlock[] }) | null =
     null;
   let currentModule: Module | null = null;
   let prevLesson: { slug: string; title: string } | null = null;
   let nextLesson: { slug: string; title: string } | null = null;
 
-  // Flatten all lessons in order
   const allLessons: { lesson: Lesson; module: Module }[] = [];
   course.modules?.forEach((m: Module) => {
     m.lessons?.forEach((l: Lesson) => {
@@ -79,49 +77,49 @@ export default async function LessonPage({
       {/* Sidebar — module/lesson navigation */}
       <aside className="hidden w-80 shrink-0 border-r border-ops-border bg-ops-surface lg:flex lg:flex-col">
         {/* Course title */}
-        <div className="border-b border-ops-border px-5 py-4">
+        <div className="border-b border-ops-border px-6 py-5">
           <Link
             href={`/courses/${slug}`}
-            className="flex items-center gap-2 font-caption text-xs text-ops-text-tertiary transition-colors hover:text-ops-accent"
+            className="flex items-center gap-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary transition-colors hover:text-ops-text-primary"
           >
             <svg
-              width="14"
-              height="14"
+              width="12"
+              height="12"
               viewBox="0 0 16 16"
               fill="none"
             >
               <path
                 d="M10 13L5 8L10 3"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
             Back to course
           </Link>
-          <h2 className="mt-2 font-heading text-sm font-semibold text-ops-text-primary">
+          <h2 className="mt-3 font-heading text-sm font-medium text-ops-text-primary">
             {course.title}
           </h2>
           {/* Progress */}
-          <div className="mt-3 flex items-center gap-2">
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-ops-border">
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-[2px] flex-1 overflow-hidden rounded-full bg-ops-border">
               <div
-                className="h-1 rounded-full bg-ops-accent transition-all"
+                className="h-[2px] rounded-full bg-ops-accent transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="font-caption text-[10px] text-ops-text-tertiary">
+            <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
               {currentIdx + 1}/{allLessons.length}
             </span>
           </div>
         </div>
 
         {/* Module list */}
-        <nav className="flex-1 overflow-y-auto py-2">
+        <nav className="flex-1 overflow-y-auto py-3">
           {course.modules?.map((module: Module, moduleIdx: number) => (
-            <div key={module.id} className="mb-1">
-              <div className="px-5 py-2 font-caption text-[10px] font-medium uppercase tracking-wider text-ops-text-tertiary">
+            <div key={module.id} className="mb-2">
+              <div className="px-6 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
                 Module {moduleIdx + 1}: {module.title}
               </div>
               {module.lessons?.map((lesson: Lesson, lessonIdx: number) => {
@@ -130,20 +128,20 @@ export default async function LessonPage({
                   <Link
                     key={lesson.id}
                     href={`/courses/${slug}/lessons/${lesson.slug}`}
-                    className={`flex items-center gap-3 px-5 py-2.5 text-sm transition-colors ${
+                    className={`flex items-center gap-3 px-6 py-2.5 text-sm transition-colors ${
                       isActive
-                        ? 'border-l-2 border-ops-accent bg-ops-accent/5 text-ops-accent'
-                        : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-ops-surface-hover hover:text-ops-text-primary'
+                        ? 'border-l-2 border-ops-accent bg-ops-accent/[0.05] text-ops-accent'
+                        : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-ops-surface-elevated hover:text-ops-text-primary'
                     }`}
                   >
-                    <span className="shrink-0 font-caption text-[10px] text-ops-text-tertiary">
+                    <span className="shrink-0 font-caption text-[10px]">
                       {moduleIdx + 1}.{lessonIdx + 1}
                     </span>
-                    <span className="flex-1 truncate font-body text-sm">
+                    <span className="flex-1 truncate font-body text-sm font-light">
                       {lesson.title}
                     </span>
                     {lesson.duration_minutes && (
-                      <span className="shrink-0 font-caption text-[10px] text-ops-text-tertiary">
+                      <span className="shrink-0 font-caption text-[10px] text-ops-text-secondary">
                         {lesson.duration_minutes}m
                       </span>
                     )}
@@ -158,30 +156,30 @@ export default async function LessonPage({
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Top bar (mobile) */}
-        <div className="flex items-center gap-3 border-b border-ops-border px-4 py-3 lg:hidden">
+        <div className="flex items-center gap-3 border-b border-ops-border px-6 py-4 lg:hidden">
           <Link
             href={`/courses/${slug}`}
-            className="text-ops-text-tertiary transition-colors hover:text-ops-accent"
+            className="text-ops-text-secondary transition-colors hover:text-ops-text-primary"
           >
-            <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
               <path
                 d="M10 13L5 8L10 3"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </Link>
           <div className="flex-1">
-            <p className="font-caption text-[10px] text-ops-text-tertiary">
+            <p className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
               {currentModule?.title}
             </p>
-            <p className="truncate font-heading text-sm font-semibold text-ops-text-primary">
+            <p className="truncate font-heading text-sm font-medium text-ops-text-primary">
               {currentLesson.title}
             </p>
           </div>
-          <span className="font-caption text-[10px] text-ops-text-tertiary">
+          <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
             {currentIdx + 1}/{allLessons.length}
           </span>
         </div>

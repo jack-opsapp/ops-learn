@@ -1,47 +1,49 @@
 @import "tailwindcss";
 
+/*
+ * OPS Learn Design Tokens — aligned with ops-site
+ * Source of truth: ops-site/src/lib/theme.ts + globals.css
+ */
 @theme inline {
-  /* Colors */
+  /* Colors — matches ops-site exactly */
   --color-ops-background: #0A0A0A;
   --color-ops-surface: #0D0D0D;
   --color-ops-surface-elevated: #141414;
-  --color-ops-surface-hover: #1A1A1A;
   --color-ops-text-primary: #FFFFFF;
   --color-ops-text-secondary: #999999;
-  --color-ops-text-tertiary: #666666;
   --color-ops-accent: #597794;
-  --color-ops-accent-hover: #6B8DAB;
   --color-ops-border: rgba(255, 255, 255, 0.10);
   --color-ops-border-hover: rgba(255, 255, 255, 0.25);
+  --color-ops-text-dark: #1A1A1A;
+  --color-ops-background-light: #FFFFFF;
+
+  /* Learn-specific semantic colors (kept minimal) */
   --color-ops-success: #A5B368;
   --color-ops-warning: #C4A868;
-  --color-ops-error: #93321A;
 
-  /* Fonts */
+  /* Fonts — same as ops-site */
   --font-heading: 'Mohave', sans-serif;
   --font-body: 'Mohave', sans-serif;
   --font-caption: 'Kosugi', sans-serif;
 
-  /* Radius */
+  /* Radius — ultra-sharp, matches ops-site (2-4px) */
   --radius-ops-sm: 2px;
   --radius-ops-md: 3px;
-  --radius-ops-lg: 5px;
-  --radius-ops-xl: 8px;
-  --radius-ops-2xl: 12px;
+  --radius-ops-lg: 4px;
 
-  /* 8pt grid spacing */
-  --spacing-ops-xs: 4px;
-  --spacing-ops-sm: 8px;
-  --spacing-ops-md: 16px;
-  --spacing-ops-lg: 24px;
-  --spacing-ops-xl: 32px;
-  --spacing-ops-2xl: 48px;
-  --spacing-ops-3xl: 64px;
-  --spacing-ops-4xl: 96px;
+  /* 8pt grid spacing — matches ops-site */
+  --spacing-ops-xs: 8px;
+  --spacing-ops-sm: 16px;
+  --spacing-ops-md: 24px;
+  --spacing-ops-lg: 32px;
+  --spacing-ops-xl: 48px;
+  --spacing-ops-2xl: 64px;
+  --spacing-ops-3xl: 96px;
+  --spacing-ops-4xl: 128px;
 
   /* Animations */
   --animate-fade-in: fadeIn 0.3s ease-out forwards;
-  --animate-fade-up: fadeUp 0.5s ease-out forwards;
+  --animate-fade-up: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   --animate-slide-up: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -95,10 +97,6 @@
 }
 
 /* Base */
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   font-family: 'Mohave', sans-serif;
   background-color: #0A0A0A;
@@ -107,9 +105,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar */
+/* Scrollbar — matches ops-site */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -118,26 +116,17 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* Selection */
+/* Selection — matches ops-site */
 ::selection {
   background: rgba(89, 119, 148, 0.4);
   color: #FFFFFF;
-}
-
-/* Autofill */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #0D0D0D inset;
-  -webkit-text-fill-color: #FFFFFF;
-  caret-color: #FFFFFF;
 }
 
 /* Keyframes */
@@ -156,10 +145,6 @@ input:-webkit-autofill:focus {
   to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes progressFill {
-  from { width: 0; }
-}
-
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -170,4 +155,84 @@ input:-webkit-autofill:focus {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Prose overrides for lesson content */
+.prose-ops h2 {
+  font-family: 'Mohave', sans-serif;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+}
+
+.prose-ops h3 {
+  font-family: 'Mohave', sans-serif;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-ops p {
+  font-family: 'Mohave', sans-serif;
+  font-weight: 300;
+  color: #999999;
+  line-height: 1.75;
+  margin-bottom: 1em;
+}
+
+.prose-ops strong {
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.prose-ops a {
+  color: #597794;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(89, 119, 148, 0.4);
+  transition: text-decoration-color 0.2s;
+}
+
+.prose-ops a:hover {
+  text-decoration-color: #597794;
+}
+
+.prose-ops ul, .prose-ops ol {
+  color: #999999;
+  font-weight: 300;
+  padding-left: 1.25em;
+}
+
+.prose-ops li {
+  margin-bottom: 0.5em;
+}
+
+.prose-ops blockquote {
+  border-left: 2px solid rgba(255, 255, 255, 0.20);
+  padding-left: 1em;
+  color: #999999;
+  font-style: normal;
+  font-weight: 300;
+}
+
+.prose-ops code {
+  background: #141414;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.875em;
+  color: #FFFFFF;
+}
+
+.prose-ops pre {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 3px;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+.prose-ops img {
+  border-radius: 3px;
 }
