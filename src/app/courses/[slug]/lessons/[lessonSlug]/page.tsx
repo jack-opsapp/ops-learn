@@ -7,7 +7,6 @@ import {
   getContentBlocksByLessonId,
   getSessionUser,
   getUserEnrollment,
-  enrollInFreeCourse,
   getUserAssessmentScores,
 } from '@/lib/supabase/queries';
 import type { ModuleItem } from '@/lib/supabase/queries';
@@ -50,13 +49,11 @@ export default async function LessonPage({
   }
   if (!targetLesson) notFound();
 
-  // Enrollment check
-  let enrollment = await getUserEnrollment(sessionUser.uid, courseData.id);
+  // Enrollment check — must have active enrollment (or preview lesson)
+  const enrollment = await getUserEnrollment(sessionUser.uid, courseData.id);
 
-  if (!enrollment) {
-    if (isFree) {
-      await enrollInFreeCourse(sessionUser.uid, courseData.id);
-    } else if (!targetLesson.is_preview) {
+  if (!enrollment || enrollment.status !== 'active') {
+    if (!targetLesson.is_preview) {
       redirect(`/courses/${slug}`);
     }
   }

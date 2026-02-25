@@ -7,7 +7,6 @@ import {
   getAssessmentBySlug,
   getSessionUser,
   getUserEnrollment,
-  enrollInFreeCourse,
   getUserAssessmentScores,
 } from '@/lib/supabase/queries';
 import type { ModuleItem } from '@/lib/supabase/queries';
@@ -29,16 +28,11 @@ export default async function AssessmentPage({
   const courseData = await getCourseWithModuleItems(slug);
   if (!courseData) notFound();
 
-  // Enrollment check
-  const isFree = courseData.price_cents === 0;
-  let enrollment = await getUserEnrollment(sessionUser.uid, courseData.id);
+  // Enrollment check — must have active enrollment
+  const enrollment = await getUserEnrollment(sessionUser.uid, courseData.id);
 
-  if (!enrollment) {
-    if (isFree) {
-      await enrollInFreeCourse(sessionUser.uid, courseData.id);
-    } else {
-      redirect(`/courses/${slug}`);
-    }
+  if (!enrollment || enrollment.status !== 'active') {
+    redirect(`/courses/${slug}`);
   }
 
   // Fetch the assessment with full question data

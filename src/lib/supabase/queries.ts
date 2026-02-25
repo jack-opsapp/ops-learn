@@ -67,12 +67,30 @@ export async function createPaidEnrollment(userId: string, courseId: string) {
 
   const { data, error } = await supabase
     .from('enrollments')
-    .insert({ user_id: userId, course_id: courseId, status: 'active' })
+    .insert({ user_id: userId, course_id: courseId, status: 'purchased' })
     .select('id, status')
     .single();
 
   if (error) {
     console.error('Error creating paid enrollment:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function activateEnrollment(userId: string, courseId: string) {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('enrollments')
+    .update({ status: 'active' })
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .eq('status', 'purchased')
+    .select('id, status')
+    .single();
+
+  if (error) {
+    console.error('Error activating enrollment:', error);
     return null;
   }
   return data;

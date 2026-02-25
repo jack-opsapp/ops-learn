@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }
 
-  const { courseId, successUrl, cancelUrl } = await request.json();
+  const { courseId, successUrl, cancelUrl, promoCode } = await request.json();
 
   // Call the Edge Function with the service role key
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
@@ -38,6 +38,7 @@ export async function POST(request: Request) {
         userEmail: decoded.email,
         successUrl,
         cancelUrl,
+        promoCode,
       }),
     }
   );

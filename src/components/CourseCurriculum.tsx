@@ -18,8 +18,8 @@ interface CourseCurriculumProps {
   courseSlug: string;
   priceCents: number;
   courseId: string;
-  /** null = not signed in, false = signed in but not enrolled, true = enrolled */
-  enrolled: boolean | null;
+  /** null = not signed in, false = not enrolled, 'purchased' = paid but not added, true = active */
+  enrolled: null | false | 'purchased' | true;
 }
 
 export default function CourseCurriculum({
@@ -34,7 +34,7 @@ export default function CourseCurriculum({
   const [buyError, setBuyError] = useState<string | null>(null);
 
   const isFree = priceCents === 0;
-  const hasAccess = enrolled === true || isFree;
+  const hasAccess = enrolled === true;
 
   function toggleModule(moduleId: string) {
     setOpenModuleId((prev) => (prev === moduleId ? null : moduleId));
@@ -49,7 +49,7 @@ export default function CourseCurriculum({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId,
-          successUrl: `${window.location.origin}/courses/${courseSlug}?enrolled=true`,
+          successUrl: `${window.location.origin}/courses/${courseSlug}?paid=true`,
           cancelUrl: `${window.location.origin}/courses/${courseSlug}`,
         }),
       });
@@ -72,7 +72,7 @@ export default function CourseCurriculum({
         const lessons = module.items.filter((i) => i.kind === 'lesson');
         const assessments = module.items.filter((i) => i.kind === 'assessment');
         const hasPreviewLessons = lessons.some((l) => l.kind === 'lesson' && l.is_preview);
-        const showAccessBadge = !hasAccess && !isFree;
+        const showAccessBadge = !hasAccess && enrolled !== null;
 
         return (
           <div
@@ -104,7 +104,7 @@ export default function CourseCurriculum({
                   </span>
                 ) : (
                   <span className="shrink-0 rounded-[3px] border border-ops-border px-2.5 py-1 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
-                    Buy to Unlock
+                    {isFree || enrolled === 'purchased' ? 'Add Course to Unlock' : 'Buy to Unlock'}
                   </span>
                 )
               )}
@@ -167,7 +167,7 @@ export default function CourseCurriculum({
                                     <span className="font-body text-sm text-ops-text-primary">
                                       {item.title}
                                     </span>
-                                    {item.is_preview && !isFree && !enrolled && (
+                                    {item.is_preview && !isFree && enrolled !== true && (
                                       <span className="rounded-[3px] border border-ops-accent/30 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
                                         Preview
                                       </span>
@@ -187,7 +187,7 @@ export default function CourseCurriculum({
                                     href={`/courses/${courseSlug}/lessons/${item.slug}`}
                                     className="inline-flex items-center gap-2 rounded-[3px] border border-ops-border px-4 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary transition-all hover:border-ops-border-hover hover:text-ops-text-primary"
                                   >
-                                    {enrolled ? 'Go to Lesson' : 'Preview Lesson'}
+                                    {enrolled === true ? 'Go to Lesson' : 'Preview Lesson'}
                                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                                       <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
@@ -202,6 +202,10 @@ export default function CourseCurriculum({
                                     >
                                       Sign In to Access
                                     </a>
+                                  ) : isFree || enrolled === 'purchased' ? (
+                                    <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/40">
+                                      Add course to access
+                                    </span>
                                   ) : (
                                     <button
                                       onClick={handleBuy}
@@ -282,7 +286,7 @@ export default function CourseCurriculum({
                             ) : (
                               <div className="mt-3 ml-8">
                                 <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/40">
-                                  Enroll to access
+                                  Add course to access
                                 </span>
                               </div>
                             )}

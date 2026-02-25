@@ -5,16 +5,17 @@ import Footer from '@/components/Footer';
 import EnrollButton from '@/components/EnrollButton';
 import CourseCurriculum from '@/components/CourseCurriculum';
 import { getCourseWithModuleItems, getSessionUser, getUserEnrollment, createPaidEnrollment } from '@/lib/supabase/queries';
+import { getCourseChallenge, getChallengeAttempt } from '@/lib/supabase/challenge-queries';
 
 export default async function CourseDetail({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ enrolled?: string }>;
+  searchParams: Promise<{ paid?: string }>;
 }) {
   const { slug } = await params;
-  const { enrolled: enrolledParam } = await searchParams;
+  const { paid: paidParam } = await searchParams;
   const course = await getCourseWithModuleItems(slug);
 
   if (!course) notFound();
@@ -25,15 +26,29 @@ export default async function CourseDetail({
     : null;
 
   // If redirected from Stripe checkout success and no enrollment exists yet,
-  // create it now (safety net in case webhook hasn't fired yet)
-  if (enrolledParam === 'true' && sessionUser && !enrollment) {
+  // create it with 'purchased' status (user must still click "Add Course" to activate)
+  if (paidParam === 'true' && sessionUser && !enrollment) {
     enrollment = await createPaidEnrollment(sessionUser.uid, course.id);
   }
 
-  // enrolled: null = not signed in, false = signed in but not enrolled, true = enrolled
-  const enrolled = sessionUser === null ? null : enrollment !== null;
+  // enrolled: null = not signed in, false = not enrolled,
+  // 'purchased' = paid but not added, true = active/completed
+  const enrolled: null | false | 'purchased' | true = sessionUser === null
+    ? null
+    : !enrollment
+      ? false
+      : enrollment.status === 'purchased'
+        ? 'purchased'
+        : true;
 
   const isFree = course.price_cents === 0;
+
+  // Check if course has a challenge quiz
+  const challenge = !isFree ? await getCourseChallenge(course.id) : null;
+  let challengeAttempt = null;
+  if (challenge && sessionUser) {
+    challengeAttempt = await getChallengeAttempt(challenge.id, sessionUser.uid);
+  }
   const totalLessons = course.modules?.reduce(
     (acc, m) => acc + m.items.filter((i) => i.kind === 'lesson').length,
     0
@@ -117,6 +132,19 @@ export default async function CourseDetail({
                   priceCents={course.price_cents}
                   enrolled={enrolled}
                 />
+                {/* Challenge CTA — paid courses with a challenge, not yet actively enrolled */}
+                {challenge && enrolled !== true && (
+                  <div className="mt-3">
+                    <a
+                      href={`/courses/${slug}/challenge`}
+                      className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-ops-border px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-text-secondary transition-all duration-200 hover:border-ops-border-hover hover:text-ops-text-primary"
+                    >
+                      {challengeAttempt
+                        ? 'View Challenge Results'
+                        : 'Challenge This Course'}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
