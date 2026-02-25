@@ -81,9 +81,12 @@ function MCQuestionRenderer({
   return (
     <div className="space-y-3">
       {question.options.map((option, idx) => (
-        <label
+        <button
           key={idx}
-          className={`flex cursor-pointer items-center gap-3 rounded-[3px] border p-3 transition-all duration-200 ${
+          type="button"
+          onClick={() => !disabled && onChange(idx)}
+          disabled={disabled}
+          className={`flex w-full cursor-pointer items-center gap-3 rounded-[3px] border p-3 text-left transition-all duration-200 ${
             value === idx
               ? 'border-ops-accent bg-ops-accent/[0.05]'
               : 'border-ops-border hover:border-ops-border-hover'
@@ -103,7 +106,7 @@ function MCQuestionRenderer({
           <span className="font-body text-sm font-light text-ops-text-primary">
             {option}
           </span>
-        </label>
+        </button>
       ))}
     </div>
   );
