@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/supabase/queries';
 import { createServiceClient } from '@/lib/supabase/server';
 import { gradeAssignment, type AssignmentContent } from '@/lib/grading';
+import { recalculateCourseGrade } from '@/lib/course-grade';
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -22,8 +23,8 @@ export async function POST(request: Request) {
 
   // Fetch the submission
   const { data: submission, error: subErr } = await supabase
-    .from('assignment_submissions')
-    .select('id, user_id, content_block_id, answers, status')
+    .from('assessment_submissions')
+    .select('id, user_id, assessment_id, answers, status')
     .eq('id', submissionId)
     .single();
 
@@ -47,23 +48,30 @@ export async function POST(request: Request) {
     );
   }
 
-  // Fetch the content block to get questions + rubric
-  const { data: block, error: blockErr } = await supabase
-    .from('content_blocks')
-    .select('content')
-    .eq('id', submission.content_block_id)
+  // Fetch the assessment to get questions + rubric
+  const { data: assessment, error: assessErr } = await supabase
+    .from('assessments')
+    .select('id, title, instructions, questions, module_id')
+    .eq('id', submission.assessment_id)
     .single();
 
-  if (blockErr || !block) {
+  if (assessErr || !assessment) {
     return NextResponse.json(
-      { error: 'Content block not found' },
+      { error: 'Assessment not found' },
       { status: 404 }
     );
   }
 
   try {
+    // Reuse gradeAssignment from grading.ts — it works with any question array
+    const content: AssignmentContent = {
+      title: assessment.title,
+      instructions: assessment.instructions ?? '',
+      questions: assessment.questions as AssignmentContent['questions'],
+    };
+
     const result = await gradeAssignment(
-      block.content as unknown as AssignmentContent,
+      content,
       submission.answers as Record<string, unknown>
     );
 
@@ -75,7 +83,7 @@ export async function POST(request: Request) {
 
     // Update submission with grading results
     const { error: updateErr } = await supabase
-      .from('assignment_submissions')
+      .from('assessment_submissions')
       .update({
         score: percentScore,
         feedback: result.questionFeedback,
@@ -85,11 +93,23 @@ export async function POST(request: Request) {
       .eq('id', submissionId);
 
     if (updateErr) {
-      console.error('[grade] Update failed:', updateErr);
+      console.error('[assessments/grade] Update failed:', updateErr);
       return NextResponse.json(
         { error: 'Failed to save grading results' },
         { status: 500 }
       );
+    }
+
+    // Recalculate course grade
+    // Get course_id from module
+    const { data: module } = await supabase
+      .from('modules')
+      .select('course_id')
+      .eq('id', assessment.module_id)
+      .single();
+
+    if (module?.course_id) {
+      await recalculateCourseGrade(user.uid, module.course_id);
     }
 
     return NextResponse.json({
@@ -98,11 +118,11 @@ export async function POST(request: Request) {
       status: 'graded',
     });
   } catch (err) {
-    console.error('[grade] Grading failed:', err);
+    console.error('[assessments/grade] Grading failed:', err);
 
     // Mark submission as error
     await supabase
-      .from('assignment_submissions')
+      .from('assessment_submissions')
       .update({ status: 'error' })
       .eq('id', submissionId);
 

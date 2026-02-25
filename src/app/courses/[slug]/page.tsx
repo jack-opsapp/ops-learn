@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EnrollButton from '@/components/EnrollButton';
 import CourseCurriculum from '@/components/CourseCurriculum';
-import { getCourseBySlug, getSessionUser, getUserEnrollment, createPaidEnrollment } from '@/lib/supabase/queries';
+import { getCourseWithModuleItems, getSessionUser, getUserEnrollment, createPaidEnrollment } from '@/lib/supabase/queries';
 
 export default async function CourseDetail({
   params,
@@ -15,7 +15,7 @@ export default async function CourseDetail({
 }) {
   const { slug } = await params;
   const { enrolled: enrolledParam } = await searchParams;
-  const course = await getCourseBySlug(slug);
+  const course = await getCourseWithModuleItems(slug);
 
   if (!course) notFound();
 
@@ -34,11 +34,14 @@ export default async function CourseDetail({
   const enrolled = sessionUser === null ? null : enrollment !== null;
 
   const isFree = course.price_cents === 0;
-  const totalLessons =
-    course.modules?.reduce(
-      (acc: number, m: { lessons?: unknown[] }) => acc + (m.lessons?.length ?? 0),
-      0
-    ) ?? 0;
+  const totalLessons = course.modules?.reduce(
+    (acc, m) => acc + m.items.filter((i) => i.kind === 'lesson').length,
+    0
+  ) ?? 0;
+  const totalAssessments = course.modules?.reduce(
+    (acc, m) => acc + m.items.filter((i) => i.kind === 'assessment').length,
+    0
+  ) ?? 0;
 
   return (
     <>
@@ -91,6 +94,12 @@ export default async function CourseDetail({
                 <span>{course.modules?.length ?? 0} modules</span>
                 <span className="text-ops-border">|</span>
                 <span>{totalLessons} lessons</span>
+                {totalAssessments > 0 && (
+                  <>
+                    <span className="text-ops-border">|</span>
+                    <span>{totalAssessments} assessments</span>
+                  </>
+                )}
                 {course.estimated_duration_minutes && (
                   <>
                     <span className="text-ops-border">|</span>
@@ -104,7 +113,7 @@ export default async function CourseDetail({
                 <EnrollButton
                   courseId={course.id}
                   courseSlug={slug}
-                  firstLessonSlug={course.modules?.[0]?.lessons?.[0]?.slug ?? null}
+                  firstLessonSlug={course.modules?.[0]?.items?.find((i) => i.kind === 'lesson')?.slug ?? null}
                   priceCents={course.price_cents}
                   enrolled={enrolled}
                 />

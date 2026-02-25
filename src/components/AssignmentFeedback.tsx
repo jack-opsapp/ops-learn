@@ -15,7 +15,8 @@ interface AssignmentFeedbackProps {
     type: string;
     question: string;
   }>;
-  onRetake: () => void;
+  onRetake?: () => void;
+  attemptsRemaining?: number;
 }
 
 export default function AssignmentFeedback({
@@ -23,6 +24,7 @@ export default function AssignmentFeedback({
   feedback,
   questions,
   onRetake,
+  attemptsRemaining,
 }: AssignmentFeedbackProps) {
   const scoreColor =
     score >= 80
@@ -100,12 +102,21 @@ export default function AssignmentFeedback({
       </div>
 
       {/* Retake */}
-      <button
-        onClick={onRetake}
-        className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-ops-border px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-text-secondary transition-all duration-200 hover:border-ops-border-hover hover:text-ops-text-primary"
-      >
-        Retake Assignment
-      </button>
+      {onRetake && (
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onRetake}
+            className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-ops-border px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-text-secondary transition-all duration-200 hover:border-ops-border-hover hover:text-ops-text-primary"
+          >
+            Retake
+          </button>
+          {attemptsRemaining !== undefined && (
+            <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+              {attemptsRemaining} {attemptsRemaining === 1 ? 'attempt' : 'attempts'} remaining
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

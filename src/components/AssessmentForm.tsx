@@ -36,12 +36,6 @@ interface WorkbookQuestion {
 
 type Question = MCQuestion | ShortAnswerQuestion | WorkbookQuestion;
 
-interface AssignmentContent {
-  title: string;
-  instructions: string;
-  questions: Question[];
-}
-
 interface QuestionFeedback {
   questionId: string;
   score: number;
@@ -51,13 +45,25 @@ interface QuestionFeedback {
 
 interface Submission {
   id: string;
+  attempt_number: number;
   answers: Record<string, unknown>;
   score: number | null;
   feedback: QuestionFeedback[] | null;
   status: string;
 }
 
-type AssignmentState = 'idle' | 'submitting' | 'grading' | 'graded';
+interface AssessmentFormProps {
+  assessmentId: string;
+  title: string;
+  instructions: string;
+  questions: Question[];
+  assessmentType: 'quiz' | 'assignment' | 'test';
+  maxRetakes: number;
+  passingScore: number;
+  userId: string;
+}
+
+type FormState = 'idle' | 'submitting' | 'grading' | 'graded';
 
 // --- Sub-components ---
 
@@ -174,54 +180,61 @@ function WorkbookRenderer({
 
 // --- Main ---
 
-export default function AssignmentBlock({
-  blockId,
-  content,
+export default function AssessmentForm({
+  assessmentId,
+  title,
+  instructions,
+  questions,
+  assessmentType,
+  maxRetakes,
+  passingScore,
   userId,
-}: {
-  blockId: string;
-  content: AssignmentContent;
-  userId: string;
-}) {
-  const [state, setState] = useState<AssignmentState>('idle');
+}: AssessmentFormProps) {
+  const [state, setState] = useState<FormState>('idle');
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [submission, setSubmission] = useState<Submission | null>(null);
+  const [attemptCount, setAttemptCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  // Load existing submission on mount
-  const loadSubmission = useCallback(async () => {
+  const attemptsRemaining = maxRetakes - attemptCount;
+  const hasAttemptsLeft = attemptsRemaining > 0;
+
+  // Load existing submissions on mount
+  const loadSubmissions = useCallback(async () => {
     try {
-      const res = await fetch(
-        `/api/assignments/submission?contentBlockId=${blockId}`
-      );
+      const res = await fetch(`/api/assessments/submissions?assessmentId=${assessmentId}`);
       if (!res.ok) return;
       const data = await res.json();
-      if (data.submission) {
-        setSubmission(data.submission);
-        if (data.submission.status === 'graded') {
+      if (data.submissions?.length > 0) {
+        setAttemptCount(data.submissions.length);
+        // Find latest graded submission
+        const graded = data.submissions.find((s: Submission) => s.status === 'graded');
+        if (graded) {
+          setSubmission(graded);
+          setAnswers(graded.answers ?? {});
           setState('graded');
-          setAnswers(data.submission.answers ?? {});
-        } else if (data.submission.status === 'submitted') {
-          // Submission exists but not graded yet — trigger grading
-          setAnswers(data.submission.answers ?? {});
-          await triggerGrading(data.submission.id);
+        } else {
+          // Latest submission exists but not graded — trigger grading
+          const latest = data.submissions[0];
+          setAnswers(latest.answers ?? {});
+          await triggerGrading(latest.id);
         }
       }
     } catch {
-      // Silently fail — user can still fill out the assignment
+      // Silently fail
     }
-  }, [blockId]);
+  }, [assessmentId]);
 
   useEffect(() => {
-    if (userId) loadSubmission();
-  }, [userId, loadSubmission]);
+    if (userId) loadSubmissions();
+  }, [userId, loadSubmissions]);
 
   async function triggerGrading(submissionId: string) {
     setState('grading');
     setError(null);
 
     try {
-      const res = await fetch('/api/assignments/grade', {
+      const res = await fetch('/api/assessments/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ submissionId }),
@@ -235,13 +248,8 @@ export default function AssignmentBlock({
       const result = await res.json();
       setSubmission((prev) =>
         prev
-          ? {
-              ...prev,
-              score: result.score,
-              feedback: result.feedback,
-              status: 'graded',
-            }
-          : null
+          ? { ...prev, score: result.score, feedback: result.feedback, status: 'graded' }
+          : { id: submissionId, attempt_number: attemptCount, answers, score: result.score, feedback: result.feedback, status: 'graded' }
       );
       setState('graded');
     } catch (err) {
@@ -255,10 +263,10 @@ export default function AssignmentBlock({
     setError(null);
 
     try {
-      const res = await fetch('/api/assignments/submit', {
+      const res = await fetch('/api/assessments/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contentBlockId: blockId, answers }),
+        body: JSON.stringify({ assessmentId, answers }),
       });
 
       if (!res.ok) {
@@ -266,9 +274,11 @@ export default function AssignmentBlock({
         throw new Error(data.error ?? 'Submission failed');
       }
 
-      const { submissionId } = await res.json();
+      const { submissionId, attemptNumber } = await res.json();
+      setAttemptCount(attemptNumber);
       setSubmission({
         id: submissionId,
+        attempt_number: attemptNumber,
         answers,
         score: null,
         feedback: null,
@@ -283,6 +293,7 @@ export default function AssignmentBlock({
   }
 
   function handleRetake() {
+    if (!hasAttemptsLeft) return;
     setAnswers({});
     setSubmission(null);
     setState('idle');
@@ -291,42 +302,70 @@ export default function AssignmentBlock({
 
   const isDisabled = state !== 'idle';
 
+  const typeLabel = assessmentType === 'test' ? 'Module Test' : assessmentType === 'assignment' ? 'Assignment' : 'Quiz';
+
   // Graded state — show feedback
   if (state === 'graded' && submission?.feedback && submission.score !== null) {
+    const passed = submission.score >= passingScore;
+
     return (
-      <div className="rounded-[3px] border border-ops-border bg-ops-background p-6">
-        <p className="mb-1 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-accent">
-          Assignment
-        </p>
-        <h3 className="mb-6 font-heading text-lg font-medium text-ops-text-primary">
-          {content.title}
-        </h3>
+      <div>
+        {/* Attempt counter */}
+        <div className="mb-6 flex items-center gap-4">
+          <span className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+            Attempt {attemptCount} of {maxRetakes}
+          </span>
+          {passed && (
+            <span className="rounded-[2px] bg-ops-success/10 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-success">
+              Passed
+            </span>
+          )}
+        </div>
+
         <AssignmentFeedback
           score={submission.score}
           feedback={submission.feedback}
-          questions={content.questions}
-          onRetake={handleRetake}
+          questions={questions}
+          onRetake={hasAttemptsLeft ? handleRetake : undefined}
+          attemptsRemaining={attemptsRemaining}
         />
       </div>
     );
   }
 
+  // No attempts left
+  if (!hasAttemptsLeft && state === 'idle' && attemptCount > 0) {
+    return (
+      <div className="rounded-[3px] border border-ops-border bg-ops-surface p-8 text-center">
+        <p className="font-heading text-lg font-medium text-ops-text-primary">
+          No attempts remaining
+        </p>
+        <p className="mt-2 font-body text-sm font-light text-ops-text-secondary">
+          You have used all {maxRetakes} attempts for this {typeLabel.toLowerCase()}.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-[3px] border border-ops-border bg-ops-background p-6">
-      {/* Header */}
-      <p className="mb-1 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-accent">
-        Assignment
-      </p>
-      <h3 className="mb-2 font-heading text-lg font-medium text-ops-text-primary">
-        {content.title}
-      </h3>
-      <p className="mb-8 font-body text-sm font-light text-ops-text-secondary">
-        {content.instructions}
+    <div>
+      {/* Attempt counter (only show if attempted before) */}
+      {attemptCount > 0 && (
+        <div className="mb-6">
+          <span className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+            Attempt {attemptCount + 1} of {maxRetakes}
+          </span>
+        </div>
+      )}
+
+      {/* Instructions */}
+      <p className="mb-8 font-body text-sm font-light leading-relaxed text-ops-text-secondary">
+        {instructions}
       </p>
 
       {/* Questions */}
       <div className="space-y-8">
-        {content.questions.map((question, idx) => (
+        {questions.map((question, idx) => (
           <div key={question.id}>
             <div className="mb-3 flex items-baseline gap-2">
               <span className="font-caption text-[10px] text-ops-text-secondary">
@@ -344,9 +383,7 @@ export default function AssignmentBlock({
               <MCQuestionRenderer
                 question={question}
                 value={answers[question.id] as number | undefined}
-                onChange={(v) =>
-                  setAnswers((prev) => ({ ...prev, [question.id]: v }))
-                }
+                onChange={(v) => setAnswers((prev) => ({ ...prev, [question.id]: v }))}
                 disabled={isDisabled}
               />
             )}
@@ -355,9 +392,7 @@ export default function AssignmentBlock({
               <ShortAnswerRenderer
                 question={question}
                 value={(answers[question.id] as string) ?? ''}
-                onChange={(v) =>
-                  setAnswers((prev) => ({ ...prev, [question.id]: v }))
-                }
+                onChange={(v) => setAnswers((prev) => ({ ...prev, [question.id]: v }))}
                 disabled={isDisabled}
               />
             )}
@@ -365,12 +400,8 @@ export default function AssignmentBlock({
             {question.type === 'workbook' && (
               <WorkbookRenderer
                 question={question}
-                value={
-                  (answers[question.id] as Record<string, string>) ?? {}
-                }
-                onChange={(v) =>
-                  setAnswers((prev) => ({ ...prev, [question.id]: v }))
-                }
+                value={(answers[question.id] as Record<string, string>) ?? {}}
+                onChange={(v) => setAnswers((prev) => ({ ...prev, [question.id]: v }))}
                 disabled={isDisabled}
               />
             )}
@@ -398,7 +429,7 @@ export default function AssignmentBlock({
             disabled={isDisabled}
             className="inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-accent px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-white transition-all duration-200 hover:bg-ops-accent/90 active:bg-ops-accent/80 disabled:opacity-50"
           >
-            Submit Assignment
+            Submit {typeLabel}
           </button>
         )}
       </div>

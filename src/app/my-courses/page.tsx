@@ -2,17 +2,25 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SubmissionsDashboard from '@/components/SubmissionsDashboard';
 import {
   getSessionUser,
   getUserEnrolledCourses,
   getPublishedCourses,
 } from '@/lib/supabase/queries';
 
-export default async function MyCoursesPage() {
+export default async function MyCoursesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const sessionUser = await getSessionUser();
   if (!sessionUser) {
     redirect('/auth/login?next=/my-courses');
   }
+
+  const { tab } = await searchParams;
+  const activeTab = tab === 'submissions' ? 'submissions' : 'courses';
 
   const [enrolledCourses, allCourses] = await Promise.all([
     getUserEnrolledCourses(sessionUser.uid),
@@ -42,6 +50,45 @@ export default async function MyCoursesPage() {
           </div>
         </section>
 
+        {/* Tab navigation */}
+        <section className="mx-auto max-w-[1400px] px-6 md:px-10">
+          <div className="flex items-center gap-6 border-b border-ops-border">
+            <Link
+              href="/my-courses"
+              className={`relative py-3 font-caption text-[11px] uppercase tracking-[0.15em] transition-colors ${
+                activeTab === 'courses'
+                  ? 'text-ops-text-primary'
+                  : 'text-ops-text-secondary hover:text-ops-text-primary'
+              }`}
+            >
+              My Courses
+              {activeTab === 'courses' && (
+                <span className="absolute inset-x-0 -bottom-px h-[2px] bg-ops-accent" />
+              )}
+            </Link>
+            <Link
+              href="/my-courses?tab=submissions"
+              className={`relative py-3 font-caption text-[11px] uppercase tracking-[0.15em] transition-colors ${
+                activeTab === 'submissions'
+                  ? 'text-ops-text-primary'
+                  : 'text-ops-text-secondary hover:text-ops-text-primary'
+              }`}
+            >
+              Submissions
+              {activeTab === 'submissions' && (
+                <span className="absolute inset-x-0 -bottom-px h-[2px] bg-ops-accent" />
+              )}
+            </Link>
+          </div>
+        </section>
+
+        {/* Submissions tab */}
+        {activeTab === 'submissions' ? (
+          <section className="mx-auto max-w-[1400px] px-6 py-10 md:px-10">
+            <SubmissionsDashboard />
+          </section>
+        ) : (
+        <>
         {/* My Courses */}
         <section className="mx-auto max-w-[1400px] px-6 py-10 md:px-10">
           <div className="mb-6 flex items-center justify-between">
@@ -267,6 +314,8 @@ export default async function MyCoursesPage() {
               ))}
             </div>
           </section>
+        )}
+        </>
         )}
       </main>
       <Footer />

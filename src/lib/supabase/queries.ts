@@ -279,6 +279,219 @@ export async function getContentBlocksByLessonId(lessonId: string) {
   return data ?? [];
 }
 
+// ─── Assessment Queries ───────────────────────────────────────────────
+
+interface AssessmentRow {
+  id: string;
+  title: string;
+  slug: string;
+  type: 'quiz' | 'assignment' | 'test';
+  sort_order: number;
+  description: string | null;
+}
+
+interface LessonRow {
+  id: string;
+  title: string;
+  slug: string;
+  duration_minutes: number | null;
+  sort_order: number;
+  is_preview: boolean;
+}
+
+export type ModuleItem =
+  | { kind: 'lesson'; id: string; title: string; slug: string; sort_order: number; duration_minutes: number | null; is_preview: boolean }
+  | { kind: 'assessment'; id: string; title: string; slug: string; sort_order: number; type: 'quiz' | 'assignment' | 'test'; description: string | null };
+
+interface ModuleWithItems {
+  id: string;
+  title: string;
+  description: string | null;
+  sort_order: number;
+  items: ModuleItem[];
+}
+
+/**
+ * Fetch a course with modules containing BOTH lessons and assessments,
+ * merged into a unified sorted list per module.
+ */
+export async function getCourseWithModuleItems(slug: string) {
+  const supabase = createServiceClient();
+  const { data: course, error } = await supabase
+    .from('courses')
+    .select(`
+      id, title, slug, description, thumbnail_url, price_cents, status, estimated_duration_minutes,
+      modules (
+        id, title, description, sort_order,
+        lessons ( id, title, slug, duration_minutes, sort_order, is_preview ),
+        assessments ( id, title, slug, type, sort_order, description )
+      )
+    `)
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .single();
+
+  if (error || !course) {
+    console.error('Error fetching course with items:', error);
+    return null;
+  }
+
+  // Sort modules, then merge + sort lessons & assessments per module
+  const modules: ModuleWithItems[] = (course.modules ?? [])
+    .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)
+    .map((m: { id: string; title: string; description: string | null; sort_order: number; lessons?: LessonRow[]; assessments?: AssessmentRow[] }) => {
+      const lessonItems: ModuleItem[] = (m.lessons ?? []).map((l) => ({
+        kind: 'lesson' as const,
+        id: l.id,
+        title: l.title,
+        slug: l.slug,
+        sort_order: l.sort_order,
+        duration_minutes: l.duration_minutes,
+        is_preview: l.is_preview,
+      }));
+
+      const assessmentItems: ModuleItem[] = (m.assessments ?? []).map((a) => ({
+        kind: 'assessment' as const,
+        id: a.id,
+        title: a.title,
+        slug: a.slug,
+        sort_order: a.sort_order,
+        type: a.type,
+        description: a.description,
+      }));
+
+      const items = [...lessonItems, ...assessmentItems].sort(
+        (a, b) => a.sort_order - b.sort_order
+      );
+
+      return {
+        id: m.id,
+        title: m.title,
+        description: m.description,
+        sort_order: m.sort_order,
+        items,
+      };
+    });
+
+  return { ...course, modules };
+}
+
+/**
+ * Fetch a single assessment by its slug within a course.
+ */
+export async function getAssessmentBySlug(courseSlug: string, assessmentSlug: string) {
+  const supabase = createServiceClient();
+
+  // First get the course
+  const { data: course } = await supabase
+    .from('courses')
+    .select('id, title, slug')
+    .eq('slug', courseSlug)
+    .eq('status', 'published')
+    .single();
+
+  if (!course) return null;
+
+  // Get modules for this course
+  const { data: modules } = await supabase
+    .from('modules')
+    .select('id')
+    .eq('course_id', course.id);
+
+  if (!modules?.length) return null;
+
+  const moduleIds = modules.map((m) => m.id);
+
+  // Get the assessment
+  const { data: assessment, error } = await supabase
+    .from('assessments')
+    .select('id, module_id, type, title, slug, description, instructions, questions, passing_score, max_retakes, sort_order')
+    .eq('slug', assessmentSlug)
+    .in('module_id', moduleIds)
+    .single();
+
+  if (error || !assessment) return null;
+
+  return { course, assessment };
+}
+
+/**
+ * Get user's best score per assessment for a course.
+ * Returns a map of assessmentId → best score (or null if not attempted).
+ */
+export async function getUserAssessmentScores(
+  userId: string,
+  assessmentIds: string[]
+): Promise<Record<string, number | null>> {
+  if (assessmentIds.length === 0) return {};
+
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from('assessment_submissions')
+    .select('assessment_id, score, status')
+    .eq('user_id', userId)
+    .in('assessment_id', assessmentIds)
+    .eq('status', 'graded');
+
+  const scores: Record<string, number | null> = {};
+  for (const id of assessmentIds) scores[id] = null;
+
+  if (data) {
+    for (const sub of data) {
+      const current = scores[sub.assessment_id];
+      if (current === null || (sub.score !== null && sub.score > current)) {
+        scores[sub.assessment_id] = sub.score;
+      }
+    }
+  }
+
+  return scores;
+}
+
+/**
+ * Get all assessment submissions for a user, grouped by course.
+ * Used by the submissions dashboard.
+ */
+export async function getUserAllSubmissions(userId: string) {
+  const supabase = createServiceClient();
+
+  const { data: submissions, error } = await supabase
+    .from('assessment_submissions')
+    .select(`
+      id, assessment_id, attempt_number, score, status, created_at, graded_at,
+      assessments (
+        id, title, type, slug,
+        modules (
+          id, title,
+          courses ( id, title, slug )
+        )
+      )
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user submissions:', error);
+    return [];
+  }
+
+  return submissions ?? [];
+}
+
+/**
+ * Get the count of existing submissions for a user + assessment.
+ */
+export async function getSubmissionCount(userId: string, assessmentId: string): Promise<number> {
+  const supabase = createServiceClient();
+  const { count } = await supabase
+    .from('assessment_submissions')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('assessment_id', assessmentId);
+
+  return count ?? 0;
+}
+
 export async function getLessonWithContent(
   courseSlug: string,
   lessonSlug: string

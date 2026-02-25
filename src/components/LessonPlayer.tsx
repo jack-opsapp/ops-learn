@@ -2,13 +2,19 @@
 
 import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
-import AssignmentBlock from './AssignmentBlock';
+import InteractiveTool from './InteractiveTool';
 
 interface ContentBlock {
   id: string;
   type: string;
   content: Record<string, unknown>;
   sort_order: number;
+}
+
+interface NavItem {
+  slug: string;
+  title: string;
+  href?: string; // explicit href; falls back to lesson route
 }
 
 interface LessonPlayerProps {
@@ -21,8 +27,8 @@ interface LessonPlayerProps {
   };
   moduleName: string;
   courseSlug: string;
-  prevLesson: { slug: string; title: string } | null;
-  nextLesson: { slug: string; title: string } | null;
+  prevLesson: NavItem | null;
+  nextLesson: NavItem | null;
   userId?: string;
 }
 
@@ -141,25 +147,9 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
         </div>
       );
 
-    case 'assignment': {
-      // Strip sensitive fields (correct_answer, rubric) before sending to client
-      const raw = block.content as Record<string, unknown>;
-      const questions = (
-        (raw.questions as Array<Record<string, unknown>>) ?? []
-      ).map((q) => {
-        const { correct_answer, rubric, ...safeQ } = q;
-        return safeQ;
-      });
-      const safeContent = { ...raw, questions };
-
-      return (
-        <AssignmentBlock
-          blockId={block.id}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          content={safeContent as any}
-          userId={userId ?? ''}
-        />
-      );
+    case 'interactive_tool': {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return <InteractiveTool config={block.content as any} />;
     }
 
     default:
@@ -218,7 +208,7 @@ export default function LessonPlayer({
         <div className="mt-16 flex items-center justify-between border-t border-ops-border pt-8">
           {prevLesson ? (
             <Link
-              href={`/courses/${courseSlug}/lessons/${prevLesson.slug}`}
+              href={prevLesson.href ?? `/courses/${courseSlug}/lessons/${prevLesson.slug}`}
               className="group flex items-center gap-3 text-ops-text-secondary transition-colors hover:text-ops-text-primary"
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -243,7 +233,7 @@ export default function LessonPlayer({
 
           {nextLesson ? (
             <Link
-              href={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}
+              href={nextLesson.href ?? `/courses/${courseSlug}/lessons/${nextLesson.slug}`}
               className="group flex items-center gap-3 text-ops-text-secondary transition-colors hover:text-ops-text-primary"
             >
               <div className="text-right">
