@@ -114,10 +114,10 @@ export default function ChallengeForm({
   return (
     <div className="flex flex-col gap-8">
       {questions.map((q, idx) => (
-        <div key={q.id} className="rounded-[3px] border border-ops-border bg-ops-surface p-6">
-          <p className="mb-1 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+        <div key={q.id} className="glass-surface p-6">
+          <p className="mb-1 font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
             Question {idx + 1} of {questions.length}
-            <span className="ml-2 text-ops-text-secondary/40">{q.points} pts</span>
+            <span className="ml-2 text-ops-text-mute">{q.points} pts</span>
           </p>
           <p className="font-body text-sm leading-relaxed text-ops-text-primary">
             {q.question}
@@ -130,9 +130,9 @@ export default function ChallengeForm({
                   key={optIdx}
                   type="button"
                   onClick={() => setAnswer(q.id, optIdx)}
-                  className={`cursor-pointer rounded-[3px] border px-4 py-3 text-left font-body text-sm transition-all ${
+                  className={`min-h-[44px] cursor-pointer rounded-[5px] border px-4 py-3 text-left font-body text-sm transition-colors duration-150 ${
                     answers[q.id] === optIdx
-                      ? 'border-ops-accent bg-ops-accent/10 text-ops-text-primary'
+                      ? 'border-[rgba(255,255,255,0.20)] bg-[rgba(255,255,255,0.05)] text-ops-text-primary'
                       : 'border-ops-border text-ops-text-secondary hover:border-ops-border-hover hover:text-ops-text-primary'
                   }`}
                 >
@@ -144,7 +144,7 @@ export default function ChallengeForm({
 
           {q.type === 'short_answer' && (
             <textarea
-              className="mt-4 w-full rounded-[3px] border border-ops-border bg-ops-background px-4 py-3 font-body text-sm text-ops-text-primary placeholder:text-ops-text-secondary/40 focus:border-ops-accent focus:outline-none"
+              className="mt-4 w-full rounded-[5px] border border-ops-border bg-[rgba(255,255,255,0.04)] px-4 py-3 font-body text-sm text-ops-text-primary placeholder:text-ops-text-tertiary focus:border-[rgba(255,255,255,0.20)] focus:outline-none focus-visible:outline-[1.5px] focus-visible:outline-ops-accent focus-visible:outline-offset-2"
               rows={4}
               placeholder="Type your answer..."
               value={(answers[q.id] as string) ?? ''}
@@ -158,16 +158,16 @@ export default function ChallengeForm({
         <button
           onClick={handleSubmit}
           disabled={!allAnswered || submitting}
-          className="inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-text-primary px-8 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80 disabled:opacity-50"
+          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-accent bg-transparent px-8 py-3 font-display text-[14px] uppercase tracking-wider text-ops-accent transition-colors duration-150 hover:bg-ops-accent hover:text-ops-background disabled:opacity-50"
         >
-          {submitting ? 'Grading...' : 'Submit Challenge'}
+          {submitting ? 'GRADING…' : 'SUBMIT CHALLENGE'}
         </button>
         {!allAnswered && (
-          <p className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
+          <p className="font-caption text-[11px] uppercase tracking-wider text-ops-text-tertiary">
             Answer all questions to submit
           </p>
         )}
-        {error && <p className="font-body text-sm text-red-400">{error}</p>}
+        {error && <p className="font-body text-sm text-ops-rose">{error}</p>}
       </div>
     </div>
   );

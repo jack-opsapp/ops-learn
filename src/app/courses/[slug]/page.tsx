@@ -65,60 +65,66 @@ export default async function CourseDetail({
         {/* Hero area */}
         <section className="relative px-6 pt-28 pb-12 md:px-10 lg:px-24">
           {/* Gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f] via-ops-background to-ops-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[rgba(255,255,255,0.04)] via-ops-background to-ops-background" />
 
           <div className="relative mx-auto max-w-[1400px]">
             {/* Breadcrumb */}
             <nav className="mb-8">
-              <div className="flex items-center gap-2 font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
-                <Link href="/" className="transition-colors hover:text-ops-text-primary">
-                  Courses
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+                <Link href="/" className="transition-colors duration-150 hover:text-ops-text-primary">
+                  COURSES
                 </Link>
-                <span>/</span>
-                <span className="text-ops-text-primary">{course.title}</span>
+                <span className="text-ops-text-mute" aria-hidden="true">//</span>
+                <span className="text-ops-text-primary">{course.title.toUpperCase()}</span>
               </div>
             </nav>
 
             {/* Course header */}
             <div className="max-w-2xl">
               <h1
-                className="font-heading font-bold uppercase text-ops-text-primary"
+                className="font-display font-light uppercase text-ops-text-primary"
                 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', lineHeight: 1.1 }}
               >
                 {course.title}
               </h1>
-              <p className="mt-4 font-body text-lg font-light leading-relaxed text-ops-text-secondary">
+              <p className="mt-4 font-body text-lg leading-relaxed text-ops-text-secondary">
                 {course.description}
               </p>
 
               {/* Meta bar */}
-              <div className="mt-6 flex flex-wrap items-center gap-4 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+              <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                 {enrolled === true && !isFree ? (
-                  <span className="rounded-[3px] bg-emerald-500/10 px-3 py-1 text-emerald-400">
-                    Paid
+                  <span
+                    className="rounded-[4px] px-2 py-[2px]"
+                    style={{ color: '#9DB582', background: 'rgba(157,181,130,0.12)', border: '1px solid rgba(157,181,130,0.30)' }}
+                  >
+                    PAID
                   </span>
                 ) : isFree ? (
-                  <span className="rounded-[3px] bg-ops-accent/10 px-3 py-1 text-ops-accent">
-                    Free
+                  <span
+                    className="rounded-[4px] px-2 py-[2px]"
+                    style={{ color: '#9DB582', background: 'rgba(157,181,130,0.12)', border: '1px solid rgba(157,181,130,0.30)' }}
+                  >
+                    FREE
                   </span>
                 ) : (
-                  <span className="rounded-[3px] bg-ops-accent/10 px-3 py-1 text-ops-accent">
+                  <span className="rounded-[4px] border border-ops-border bg-[rgba(255,255,255,0.05)] px-2 py-[2px] text-ops-text-primary" style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}>
                     ${(course.price_cents / 100).toFixed(0)}
                   </span>
                 )}
-                <span>{course.modules?.length ?? 0} modules</span>
-                <span className="text-ops-border">|</span>
-                <span>{totalLessons} lessons</span>
+                <span>{course.modules?.length ?? 0} MODULES</span>
+                <span className="text-ops-text-mute" aria-hidden="true">·</span>
+                <span>{totalLessons} LESSONS</span>
                 {totalAssessments > 0 && (
                   <>
-                    <span className="text-ops-border">|</span>
-                    <span>{totalAssessments} assessments</span>
+                    <span className="text-ops-text-mute" aria-hidden="true">·</span>
+                    <span>{totalAssessments} ASSESSMENTS</span>
                   </>
                 )}
                 {course.estimated_duration_minutes && (
                   <>
-                    <span className="text-ops-border">|</span>
-                    <span>{course.estimated_duration_minutes} min total</span>
+                    <span className="text-ops-text-mute" aria-hidden="true">·</span>
+                    <span>{course.estimated_duration_minutes} MIN TOTAL</span>
                   </>
                 )}
               </div>
@@ -137,11 +143,11 @@ export default async function CourseDetail({
                   <div className="mt-3">
                     <a
                       href={`/courses/${slug}/challenge`}
-                      className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-ops-border px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-text-secondary transition-all duration-200 hover:border-ops-border-hover hover:text-ops-text-primary"
+                      className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-border bg-transparent px-6 py-3 font-display text-[14px] uppercase tracking-wider text-ops-text-secondary transition-colors duration-150 hover:border-ops-border-hover hover:text-ops-text-primary"
                     >
                       {challengeAttempt
-                        ? 'View Challenge Results'
-                        : 'Challenge This Course'}
+                        ? 'VIEW CHALLENGE RESULTS'
+                        : 'CHALLENGE THIS COURSE'}
                     </a>
                   </div>
                 )}
@@ -152,8 +158,8 @@ export default async function CourseDetail({
 
         {/* Curriculum */}
         <section className="mx-auto max-w-[1400px] px-6 py-12 md:px-10">
-          <p className="mb-8 font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-            [ Curriculum ]
+          <p className="mb-8 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+            // CURRICULUM
           </p>
 
           <CourseCurriculum

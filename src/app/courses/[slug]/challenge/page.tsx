@@ -45,17 +45,17 @@ export default async function ChallengePage({
       <Header />
       <main className="relative z-10">
         <section className="relative px-6 pt-28 pb-12 md:px-10 lg:px-24">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f] via-ops-background to-ops-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[rgba(255,255,255,0.04)] via-ops-background to-ops-background" />
 
           <div className="relative mx-auto max-w-3xl">
             {/* Breadcrumb */}
             <nav className="mb-8">
-              <div className="flex items-center gap-2 font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
-                <Link href={`/courses/${slug}`} className="transition-colors hover:text-ops-text-primary">
-                  {course.title}
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+                <Link href={`/courses/${slug}`} className="transition-colors duration-150 hover:text-ops-text-primary">
+                  {course.title.toUpperCase()}
                 </Link>
-                <span>/</span>
-                <span className="text-ops-text-primary">Challenge</span>
+                <span className="text-ops-text-mute" aria-hidden="true">//</span>
+                <span className="text-ops-text-primary">CHALLENGE</span>
               </div>
             </nav>
 
@@ -74,18 +74,18 @@ export default async function ChallengePage({
             ) : (
               <>
                 <h1
-                  className="font-heading font-bold uppercase text-ops-text-primary"
+                  className="font-display font-light uppercase text-ops-text-primary"
                   style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', lineHeight: 1.1 }}
                 >
                   {challenge.title}
                 </h1>
                 {challenge.description && (
-                  <p className="mt-4 font-body text-lg font-light leading-relaxed text-ops-text-secondary">
+                  <p className="mt-4 font-body text-lg leading-relaxed text-ops-text-secondary">
                     {challenge.description}
                   </p>
                 )}
-                <div className="mt-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary/60">
-                  {clientQuestions.length} questions &middot; One attempt only
+                <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+                  {clientQuestions.length} QUESTIONS · ONE ATTEMPT ONLY
                 </div>
 
                 <div className="mt-10">

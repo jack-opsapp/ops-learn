@@ -36,11 +36,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="font-body antialiased">
         <SessionSync />
         {children}
 
-        {/* Ambient page-edge glows — matches ops-site PageLayout */}
+        {/* Ambient page-edge glows — accent at low alpha only */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <div
             className="absolute"
@@ -50,29 +58,7 @@ export default function RootLayout({
               width: '500px',
               height: '500px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(89, 119, 148, 0.05) 0%, transparent 70%)',
-            }}
-          />
-          <div
-            className="absolute"
-            style={{
-              right: '-200px',
-              top: '40%',
-              width: '450px',
-              height: '450px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(212, 98, 43, 0.035) 0%, transparent 70%)',
-            }}
-          />
-          <div
-            className="absolute"
-            style={{
-              left: '-180px',
-              top: '65%',
-              width: '400px',
-              height: '400px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(212, 98, 43, 0.03) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(111, 148, 176, 0.04) 0%, transparent 70%)',
             }}
           />
           <div
@@ -83,7 +69,7 @@ export default function RootLayout({
               width: '550px',
               height: '550px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(89, 119, 148, 0.045) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(111, 148, 176, 0.035) 0%, transparent 70%)',
             }}
           />
         </div>

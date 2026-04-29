@@ -24,9 +24,9 @@ interface CourseSidebarProps {
 // Icons for assessment types
 function QuizIcon({ className }: { className?: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className={className}>
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M6.5 6.5a1.5 1.5 0 1 1 1.5 1.5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M6.5 6.5a1.5 1.5 0 1 1 1.5 1.5v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       <circle cx="8" cy="11" r="0.5" fill="currentColor" />
     </svg>
   );
@@ -34,18 +34,18 @@ function QuizIcon({ className }: { className?: string }) {
 
 function AssignmentIcon({ className }: { className?: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className={className}>
-      <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M6 5.5h4M6 8h4M6 10.5h2.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M6 5.5h4M6 8h4M6 10.5h2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
 
 function TestIcon({ className }: { className?: string }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className={className}>
-      <path d="M8 1.5L14 5v6l-6 3.5L2 11V5l6-3.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-      <path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <path d="M8 1.5L14 5v6l-6 3.5L2 11V5l6-3.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -53,15 +53,18 @@ function TestIcon({ className }: { className?: string }) {
 function ScoreBadge({ score }: { score: number | null }) {
   if (score === null) return null;
 
-  const color =
+  const style =
     score >= 80
-      ? 'text-ops-success border-ops-success/30'
+      ? { color: '#9DB582', background: 'rgba(157,181,130,0.12)', border: '1px solid rgba(157,181,130,0.30)' }
       : score >= 50
-        ? 'text-ops-warning border-ops-warning/30'
-        : 'text-ops-accent border-ops-accent/30';
+        ? { color: '#C4A868', background: 'rgba(196,168,104,0.12)', border: '1px solid rgba(196,168,104,0.30)' }
+        : { color: '#B58289', background: 'rgba(181,130,137,0.12)', border: '1px solid rgba(181,130,137,0.30)' };
 
   return (
-    <span className={`shrink-0 rounded-[2px] border px-1.5 py-0.5 font-caption text-[9px] tabular-nums ${color}`}>
+    <span
+      className="shrink-0 rounded-[4px] px-1.5 py-[2px] font-mono text-[11px] tabular-nums"
+      style={{ ...style, fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+    >
       {score}%
     </span>
   );
@@ -69,9 +72,9 @@ function ScoreBadge({ score }: { score: number | null }) {
 
 function getAssessmentTypeLabel(type: 'quiz' | 'assignment' | 'test') {
   switch (type) {
-    case 'quiz': return 'Quiz';
-    case 'assignment': return 'Assignment';
-    case 'test': return 'Module Test';
+    case 'quiz': return 'QUIZ';
+    case 'assignment': return 'ASSIGNMENT';
+    case 'test': return 'MODULE TEST';
   }
 }
 
@@ -93,33 +96,34 @@ export default function CourseSidebar({
   totalItems,
   assessmentScores,
 }: CourseSidebarProps) {
-  let lessonCounter = 0;
-
   return (
-    <aside className="hidden w-80 shrink-0 border-r border-ops-border bg-ops-surface lg:flex lg:flex-col">
+    <aside className="hidden w-80 shrink-0 border-r border-ops-border bg-[rgba(18,18,20,0.58)] backdrop-blur-[28px] lg:flex lg:flex-col">
       {/* Course title */}
       <div className="border-b border-ops-border px-6 py-5">
         <Link
           href={`/courses/${course.slug}`}
-          className="flex items-center gap-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary transition-colors hover:text-ops-text-primary"
+          className="inline-flex min-h-[44px] items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ops-text-secondary transition-colors duration-150 hover:text-ops-text-primary"
         >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Back to course
+          BACK TO COURSE
         </Link>
         <h2 className="mt-3 font-heading text-sm font-medium text-ops-text-primary">
           {course.title}
         </h2>
         {/* Progress */}
         <div className="mt-3 flex items-center gap-3">
-          <div className="h-[2px] flex-1 overflow-hidden rounded-full bg-ops-border">
+          <div className="h-[2px] flex-1 overflow-hidden rounded-[2px] bg-ops-border">
             <div
-              className="h-[2px] rounded-full bg-ops-accent transition-all"
+              className="h-[2px] rounded-[2px] bg-ops-text-secondary transition-[width] duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
+          <span
+            className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary"
+            style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+          >
             {currentIdx + 1}/{totalItems}
           </span>
         </div>
@@ -128,40 +132,44 @@ export default function CourseSidebar({
       {/* Module list */}
       <nav className="flex-1 overflow-y-auto py-3">
         {modules.map((module, moduleIdx) => {
-          // Reset lesson counter per module for numbering
           let moduleLessonIdx = 0;
 
           return (
             <div key={module.id} className="mb-2">
-              <div className="px-6 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
-                Module {moduleIdx + 1}: {module.title}
+              <div className="px-6 py-2 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+                {`// MODULE ${moduleIdx + 1} — ${module.title}`}
               </div>
 
               {module.items.map((item) => {
                 if (item.kind === 'lesson') {
                   moduleLessonIdx++;
-                  lessonCounter++;
                   const isActive = activeKind === 'lesson' && item.slug === activeSlug;
 
                   return (
                     <Link
                       key={item.id}
                       href={`/courses/${course.slug}/lessons/${item.slug}`}
-                      className={`flex items-center gap-3 px-6 py-2.5 text-sm transition-colors ${
+                      className={`flex min-h-[44px] items-center gap-3 px-6 py-2.5 text-sm transition-colors duration-150 ${
                         isActive
-                          ? 'border-l-2 border-ops-accent bg-ops-accent/[0.05] text-ops-accent'
-                          : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-ops-surface-elevated hover:text-ops-text-primary'
+                          ? 'border-l-2 border-ops-text-secondary bg-[rgba(255,255,255,0.05)] text-ops-text-primary'
+                          : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-[rgba(255,255,255,0.04)] hover:text-ops-text-primary'
                       }`}
                     >
-                      <span className="shrink-0 font-caption text-[10px]">
+                      <span
+                        className="shrink-0 font-mono text-[11px] text-ops-text-tertiary"
+                        style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+                      >
                         {moduleIdx + 1}.{moduleLessonIdx}
                       </span>
-                      <span className="flex-1 truncate font-body text-sm font-light">
+                      <span className="flex-1 truncate font-body text-sm">
                         {item.title}
                       </span>
                       {item.duration_minutes && (
-                        <span className="shrink-0 font-caption text-[10px] text-ops-text-secondary">
-                          {item.duration_minutes}m
+                        <span
+                          className="shrink-0 font-mono text-[11px] text-ops-text-tertiary"
+                          style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+                        >
+                          {item.duration_minutes}M
                         </span>
                       )}
                     </Link>
@@ -171,30 +179,27 @@ export default function CourseSidebar({
                 // Assessment item
                 const isActive = activeKind === 'assessment' && item.slug === activeSlug;
                 const score = assessmentScores?.[item.id] ?? null;
-                const isTest = item.type === 'test';
 
                 return (
                   <Link
                     key={item.id}
                     href={`/courses/${course.slug}/assessments/${item.slug}`}
-                    className={`flex items-center gap-3 px-6 py-2.5 text-sm transition-colors ${
+                    className={`flex min-h-[44px] items-center gap-3 px-6 py-2.5 text-sm transition-colors duration-150 ${
                       isActive
-                        ? 'border-l-2 border-ops-accent bg-ops-accent/[0.05] text-ops-accent'
-                        : isTest
-                          ? 'border-l-2 border-transparent text-ops-text-primary/80 hover:bg-ops-surface-elevated hover:text-ops-text-primary'
-                          : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-ops-surface-elevated hover:text-ops-text-primary'
+                        ? 'border-l-2 border-ops-text-secondary bg-[rgba(255,255,255,0.05)] text-ops-text-primary'
+                        : 'border-l-2 border-transparent text-ops-text-secondary hover:bg-[rgba(255,255,255,0.04)] hover:text-ops-text-primary'
                     }`}
                   >
                     <span className="shrink-0">
-                      {getAssessmentIcon(item.type, isActive ? 'text-ops-accent' : 'text-ops-text-secondary')}
+                      {getAssessmentIcon(item.type, isActive ? 'text-ops-text-primary' : 'text-ops-text-tertiary')}
                     </span>
-                    <span className={`flex-1 truncate font-body text-sm ${isTest ? 'font-normal' : 'font-light'}`}>
+                    <span className="flex-1 truncate font-body text-sm">
                       {item.title}
                     </span>
                     {score !== null ? (
                       <ScoreBadge score={score} />
                     ) : (
-                      <span className="shrink-0 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
+                      <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                         {getAssessmentTypeLabel(item.type)}
                       </span>
                     )}

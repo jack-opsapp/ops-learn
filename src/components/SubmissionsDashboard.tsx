@@ -102,21 +102,28 @@ function groupSubmissions(submissions: Submission[]): CourseGroup[] {
 }
 
 function TypeBadge({ type }: { type: 'quiz' | 'assignment' | 'test' }) {
-  const labels = { quiz: 'Quiz', assignment: 'Assignment', test: 'Module Test' };
+  const labels = { quiz: 'QUIZ', assignment: 'ASSIGNMENT', test: 'MODULE TEST' };
   return (
-    <span className="rounded-[2px] border border-ops-accent/20 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+    <span className="rounded-[4px] border border-ops-border bg-[rgba(255,255,255,0.05)] px-2 py-[2px] font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
       {labels[type]}
     </span>
   );
 }
 
 function ScoreDisplay({ score }: { score: number | null }) {
-  if (score === null) return <span className="text-ops-text-secondary/50">—</span>;
+  if (score === null) return <span className="text-ops-text-tertiary">—</span>;
 
   const color =
-    score >= 80 ? 'text-ops-success' : score >= 50 ? 'text-ops-warning' : 'text-ops-accent';
+    score >= 80 ? 'text-ops-success' : score >= 50 ? 'text-ops-warning' : 'text-ops-rose';
 
-  return <span className={`font-heading text-lg font-medium tabular-nums ${color}`}>{score}%</span>;
+  return (
+    <span
+      className={`font-mono text-lg font-medium ${color}`}
+      style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+    >
+      {score}%
+    </span>
+  );
 }
 
 export default function SubmissionsDashboard() {
@@ -144,20 +151,20 @@ export default function SubmissionsDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-ops-accent border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-ops-text-secondary border-t-transparent" />
       </div>
     );
   }
 
   if (submissions.length === 0) {
     return (
-      <div className="rounded-[3px] border border-ops-border bg-ops-surface px-8 py-16 text-center">
-        <span className="font-heading text-5xl font-bold text-white/[0.04]">OPS</span>
-        <h2 className="mt-4 font-heading text-xl font-medium text-ops-text-primary">
-          No submissions yet
+      <div className="glass-surface px-8 py-16 text-center">
+        <span className="font-display text-5xl font-light tracking-wider text-white/[0.04]" aria-hidden="true">OPS</span>
+        <h2 className="mt-4 font-display text-xl font-light uppercase text-ops-text-primary">
+          NO SUBMISSIONS YET
         </h2>
-        <p className="mt-2 font-body text-sm font-light text-ops-text-secondary">
-          Complete quizzes, assignments, and tests in your courses to see them here.
+        <p className="mt-2 font-body text-sm text-ops-text-secondary">
+          Complete quizzes, assignments, and tests to see them here.
         </p>
       </div>
     );
@@ -169,8 +176,8 @@ export default function SubmissionsDashboard() {
     <div className="space-y-8">
       {courseGroups.map((courseGroup) => (
         <div key={courseGroup.courseId}>
-          <p className="mb-4 font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-            [ {courseGroup.courseTitle} ]
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+            {`// ${courseGroup.courseTitle.toUpperCase()}`}
           </p>
 
           <div className="space-y-2">
@@ -180,14 +187,14 @@ export default function SubmissionsDashboard() {
               return (
                 <div
                   key={assessment.assessmentId}
-                  className="overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface"
+                  className="glass-surface overflow-hidden"
                 >
                   {/* Assessment row */}
                   <button
                     onClick={() =>
                       setExpandedAssessment(isExpanded ? null : assessment.assessmentId)
                     }
-                    className="flex w-full items-center gap-4 px-5 py-4 text-left cursor-pointer transition-colors hover:bg-ops-surface-elevated"
+                    className="flex min-h-[44px] w-full items-center gap-4 px-5 py-4 text-left cursor-pointer transition-colors duration-150 hover:bg-[rgba(255,255,255,0.05)]"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -196,7 +203,7 @@ export default function SubmissionsDashboard() {
                         </span>
                         <TypeBadge type={assessment.type} />
                       </div>
-                      <p className="mt-0.5 font-caption text-[10px] text-ops-text-secondary">
+                      <p className="mt-0.5 font-caption text-[11px] text-ops-text-secondary">
                         {assessment.moduleTitle} · {assessment.totalAttempts} attempt{assessment.totalAttempts !== 1 ? 's' : ''} · Last{' '}
                         {new Date(assessment.lastSubmitted).toLocaleDateString('en-US', {
                           month: 'short',
@@ -210,9 +217,9 @@ export default function SubmissionsDashboard() {
                     <Link
                       href={`/courses/${assessment.courseSlug}/assessments/${assessment.slug}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="shrink-0 rounded-[3px] border border-ops-border px-3 py-1.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-text-secondary transition-colors hover:border-ops-border-hover hover:text-ops-text-primary"
+                      className="shrink-0 inline-flex min-h-[44px] items-center rounded-[5px] border border-ops-border px-3 py-1.5 font-display text-[11px] uppercase tracking-wider text-ops-text-secondary transition-colors duration-150 hover:border-ops-border-hover hover:text-ops-text-primary"
                     >
-                      {assessment.totalAttempts < 3 ? 'Retake' : 'View'}
+                      {assessment.totalAttempts < 3 ? 'RETAKE' : 'VIEW'}
                     </Link>
 
                     <svg
@@ -244,10 +251,10 @@ export default function SubmissionsDashboard() {
                                 key={sub.id}
                                 className="flex items-center gap-4 border-b border-ops-border px-5 py-3 last:border-b-0"
                               >
-                                <span className="font-caption text-[10px] text-ops-text-secondary">
+                                <span className="font-caption text-[11px] text-ops-text-secondary">
                                   Attempt {sub.attempt_number}
                                 </span>
-                                <span className="font-caption text-[10px] text-ops-text-secondary/50">
+                                <span className="font-caption text-[11px] text-ops-text-tertiary">
                                   {new Date(sub.created_at).toLocaleDateString('en-US', {
                                     month: 'short',
                                     day: 'numeric',
@@ -259,19 +266,20 @@ export default function SubmissionsDashboard() {
                                 <span className="ml-auto">
                                   {sub.status === 'graded' && sub.score !== null ? (
                                     <span
-                                      className={`font-heading text-sm tabular-nums ${
+                                      className={`font-mono text-sm ${
                                         sub.score >= 80
                                           ? 'text-ops-success'
                                           : sub.score >= 50
                                             ? 'text-ops-warning'
-                                            : 'text-ops-accent'
+                                            : 'text-ops-rose'
                                       }`}
+                                      style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
                                     >
                                       {sub.score}%
                                     </span>
                                   ) : (
-                                    <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
-                                      {sub.status}
+                                    <span className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+                                      {sub.status.toUpperCase()}
                                     </span>
                                   )}
                                 </span>

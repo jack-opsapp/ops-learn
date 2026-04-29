@@ -14,14 +14,20 @@ export default function ProgressBar({
 
   return (
     <div className="flex items-center gap-3">
-      <div className={`flex-1 overflow-hidden rounded-full bg-ops-border ${heightClass}`}>
+      <div className={`flex-1 overflow-hidden rounded-[2px] bg-ops-border ${heightClass}`}>
         <div
-          className={`${heightClass} rounded-full bg-ops-accent transition-all duration-500`}
-          style={{ width: `${clampedPercent}%` }}
+          className={`${heightClass} rounded-[2px] bg-ops-text-secondary transition-[width] duration-300`}
+          style={{
+            width: `${clampedPercent}%`,
+            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
         />
       </div>
       {showLabel && (
-        <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
+        <span
+          className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary"
+          style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+        >
           {Math.round(clampedPercent)}%
         </span>
       )}

@@ -31,69 +31,66 @@ export default function AssignmentFeedback({
       ? 'text-ops-success'
       : score >= 50
         ? 'text-ops-warning'
-        : 'text-ops-accent';
+        : 'text-ops-rose';
 
-  const scoreBorderColor =
+  const summary =
     score >= 80
-      ? 'border-ops-success'
+      ? 'Solid grasp of the material.'
       : score >= 50
-        ? 'border-ops-warning'
-        : 'border-ops-accent';
+        ? 'Good effort — review the feedback to strengthen weak areas.'
+        : 'Review the material and try again when ready.';
 
   return (
     <div className="space-y-6">
       {/* Overall score */}
-      <div
-        className={`flex items-center gap-6 rounded-[3px] border ${scoreBorderColor} bg-ops-surface p-6`}
-      >
+      <div className="glass-surface flex items-center gap-6 p-6">
         <div className="text-center">
-          <p className={`font-heading text-4xl font-bold ${scoreColor}`}>
+          <p
+            className={`font-mono font-medium text-4xl ${scoreColor}`}
+            style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+          >
             {score}%
           </p>
-          <p className="mt-1 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
-            Score
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+            // SCORE
           </p>
         </div>
         <div className="flex-1">
-          <p className="font-body text-sm font-light text-ops-text-primary">
-            {score >= 80
-              ? 'Great work! You have a solid understanding of this material.'
-              : score >= 50
-                ? 'Good effort. Review the feedback below to strengthen your understanding.'
-                : 'Keep going. Review the material and try again when you\'re ready.'}
+          <p className="font-body text-sm text-ops-text-primary">
+            {summary}
           </p>
         </div>
       </div>
 
       {/* Per-question feedback */}
       <div className="space-y-4">
-        <p className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
-          Question Breakdown
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+          // QUESTION BREAKDOWN
         </p>
         {feedback.map((qf) => {
           const question = questions.find((q) => q.id === qf.questionId);
+          const fullCredit = qf.score === qf.maxPoints;
+          const partial = qf.score > 0 && !fullCredit;
+          const tone = fullCredit
+            ? 'text-ops-success'
+            : partial
+              ? 'text-ops-warning'
+              : 'text-ops-rose';
+
           return (
-            <div
-              key={qf.questionId}
-              className="rounded-[3px] border border-ops-border bg-ops-surface p-4"
-            >
+            <div key={qf.questionId} className="glass-surface p-4">
               <div className="mb-2 flex items-start justify-between gap-4">
-                <p className="font-body text-sm font-light text-ops-text-primary">
+                <p className="font-body text-sm text-ops-text-primary">
                   {question?.question ?? qf.questionId}
                 </p>
                 <span
-                  className={`shrink-0 font-caption text-xs ${
-                    qf.score === qf.maxPoints
-                      ? 'text-ops-success'
-                      : qf.score > 0
-                        ? 'text-ops-warning'
-                        : 'text-ops-accent'
-                  }`}
+                  className={`shrink-0 font-mono text-[11px] ${tone}`}
+                  style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
                 >
                   {qf.score}/{qf.maxPoints}
                 </span>
               </div>
-              <p className="font-body text-xs font-light leading-relaxed text-ops-text-secondary">
+              <p className="font-body text-xs leading-relaxed text-ops-text-secondary">
                 {qf.feedback}
               </p>
             </div>
@@ -106,13 +103,13 @@ export default function AssignmentFeedback({
         <div className="flex items-center gap-4">
           <button
             onClick={onRetake}
-            className="inline-flex items-center justify-center gap-2 rounded-[3px] border border-ops-border px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-text-secondary transition-all duration-200 hover:border-ops-border-hover hover:text-ops-text-primary"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-border px-6 py-3 font-display text-[14px] uppercase tracking-wider text-ops-text-secondary transition-colors duration-150 hover:border-ops-border-hover hover:text-ops-text-primary"
           >
-            Retake
+            RETAKE
           </button>
           {attemptsRemaining !== undefined && (
-            <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
-              {attemptsRemaining} {attemptsRemaining === 1 ? 'attempt' : 'attempts'} remaining
+            <span className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+              {attemptsRemaining} {attemptsRemaining === 1 ? 'ATTEMPT' : 'ATTEMPTS'} REMAINING
             </span>
           )}
         </div>

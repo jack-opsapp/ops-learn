@@ -86,24 +86,24 @@ function MCQuestionRenderer({
           type="button"
           onClick={() => !disabled && onChange(idx)}
           disabled={disabled}
-          className={`flex w-full cursor-pointer items-center gap-3 rounded-[3px] border p-3 text-left transition-all duration-200 ${
+          className={`flex w-full min-h-[44px] cursor-pointer items-center gap-3 rounded-[5px] border p-3 text-left transition-colors duration-150 ${
             value === idx
-              ? 'border-ops-accent bg-ops-accent/[0.05]'
+              ? 'border-[rgba(255,255,255,0.20)] bg-[rgba(255,255,255,0.05)]'
               : 'border-ops-border hover:border-ops-border-hover'
           } ${disabled ? 'pointer-events-none opacity-60' : ''}`}
         >
           <div
             className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
               value === idx
-                ? 'border-ops-accent'
-                : 'border-ops-text-secondary'
+                ? 'border-ops-text-primary'
+                : 'border-ops-text-tertiary'
             }`}
           >
             {value === idx && (
-              <div className="h-2 w-2 rounded-full bg-ops-accent" />
+              <div className="h-2 w-2 rounded-full bg-ops-text-primary" />
             )}
           </div>
-          <span className="font-body text-sm font-light text-ops-text-primary">
+          <span className="font-body text-sm font-normal text-ops-text-primary">
             {option}
           </span>
         </button>
@@ -128,7 +128,7 @@ function ShortAnswerRenderer({
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
       rows={4}
-      className="w-full resize-y rounded-[3px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-light text-ops-text-primary placeholder:text-ops-text-secondary/50 focus:border-ops-accent focus:outline-none disabled:opacity-60"
+      className="w-full resize-y rounded-[5px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-normal text-ops-text-primary placeholder:text-ops-text-tertiary focus:border-[rgba(255,255,255,0.20)] focus:outline-none focus-visible:outline-[1.5px] focus-visible:outline-ops-accent focus-visible:outline-offset-2 disabled:opacity-60"
       placeholder="Type your answer..."
     />
   );
@@ -149,7 +149,7 @@ function WorkbookRenderer({
     <div className="space-y-4">
       {question.parts.map((part) => (
         <div key={part.id}>
-          <label className="mb-1.5 block font-body text-sm font-light text-ops-text-primary">
+          <label className="mb-1.5 block font-body text-sm font-normal text-ops-text-primary">
             {part.prompt}
           </label>
           {part.type === 'textarea' ? (
@@ -160,7 +160,7 @@ function WorkbookRenderer({
               }
               disabled={disabled}
               rows={3}
-              className="w-full resize-y rounded-[3px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-light text-ops-text-primary placeholder:text-ops-text-secondary/50 focus:border-ops-accent focus:outline-none disabled:opacity-60"
+              className="w-full resize-y rounded-[5px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-normal text-ops-text-primary placeholder:text-ops-text-tertiary focus:border-[rgba(255,255,255,0.20)] focus:outline-none focus-visible:outline-[1.5px] focus-visible:outline-ops-accent focus-visible:outline-offset-2 disabled:opacity-60"
               placeholder="Type your answer..."
             />
           ) : (
@@ -171,7 +171,7 @@ function WorkbookRenderer({
                 onChange({ ...value, [part.id]: e.target.value })
               }
               disabled={disabled}
-              className="w-full rounded-[3px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-light text-ops-text-primary placeholder:text-ops-text-secondary/50 focus:border-ops-accent focus:outline-none disabled:opacity-60"
+              className="w-full rounded-[5px] border border-ops-border bg-ops-surface p-3 font-body text-sm font-normal text-ops-text-primary placeholder:text-ops-text-tertiary focus:border-[rgba(255,255,255,0.20)] focus:outline-none focus-visible:outline-[1.5px] focus-visible:outline-ops-accent focus-visible:outline-offset-2 disabled:opacity-60"
               placeholder="Type your answer..."
             />
           )}
@@ -315,11 +315,11 @@ export default function AssessmentForm({
       <div>
         {/* Attempt counter */}
         <div className="mb-6 flex items-center gap-4">
-          <span className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+          <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
             Attempt {attemptCount} of {maxRetakes}
           </span>
           {passed && (
-            <span className="rounded-[2px] bg-ops-success/10 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-success">
+            <span className="rounded-[4px] border border-[rgba(157,181,130,0.30)] bg-[rgba(157,181,130,0.12)] px-2 py-0.5 font-caption text-[11px] uppercase tracking-wider text-ops-success">
               Passed
             </span>
           )}
@@ -339,11 +339,11 @@ export default function AssessmentForm({
   // No attempts left
   if (!hasAttemptsLeft && state === 'idle' && attemptCount > 0) {
     return (
-      <div className="rounded-[3px] border border-ops-border bg-ops-surface p-8 text-center">
+      <div className="rounded-[5px] border border-ops-border bg-ops-surface p-8 text-center">
         <p className="font-heading text-lg font-medium text-ops-text-primary">
           No attempts remaining
         </p>
-        <p className="mt-2 font-body text-sm font-light text-ops-text-secondary">
+        <p className="mt-2 font-body text-sm font-normal text-ops-text-secondary">
           You have used all {maxRetakes} attempts for this {typeLabel.toLowerCase()}.
         </p>
       </div>
@@ -355,14 +355,14 @@ export default function AssessmentForm({
       {/* Attempt counter (only show if attempted before) */}
       {attemptCount > 0 && (
         <div className="mb-6">
-          <span className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+          <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
             Attempt {attemptCount + 1} of {maxRetakes}
           </span>
         </div>
       )}
 
       {/* Instructions */}
-      <p className="mb-8 font-body text-sm font-light leading-relaxed text-ops-text-secondary">
+      <p className="mb-8 font-body text-sm font-normal leading-relaxed text-ops-text-secondary">
         {instructions}
       </p>
 
@@ -371,13 +371,13 @@ export default function AssessmentForm({
         {questions.map((question, idx) => (
           <div key={question.id}>
             <div className="mb-3 flex items-baseline gap-2">
-              <span className="font-caption text-[10px] text-ops-text-secondary">
+              <span className="font-caption text-[11px] text-ops-text-secondary">
                 {idx + 1}.
               </span>
               <p className="font-body text-sm text-ops-text-primary">
                 {question.question}
               </p>
-              <span className="ml-auto shrink-0 font-caption text-[10px] text-ops-text-secondary">
+              <span className="ml-auto shrink-0 font-caption text-[11px] text-ops-text-secondary">
                 {question.points} pts
               </span>
             </div>
@@ -414,7 +414,7 @@ export default function AssessmentForm({
 
       {/* Error */}
       {error && (
-        <p className="mt-4 font-body text-sm text-red-400">{error}</p>
+        <p className="mt-4 font-body text-sm text-ops-rose">{error}</p>
       )}
 
       {/* Submit */}
@@ -422,7 +422,7 @@ export default function AssessmentForm({
         {state === 'submitting' || state === 'grading' ? (
           <div className="flex items-center gap-3">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-ops-accent border-t-transparent" />
-            <span className="font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
+            <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
               {state === 'submitting' ? 'Submitting...' : 'Grading with AI...'}
             </span>
           </div>
@@ -430,9 +430,9 @@ export default function AssessmentForm({
           <button
             onClick={handleSubmit}
             disabled={isDisabled}
-            className="inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-accent px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-white transition-all duration-200 hover:bg-ops-accent/90 active:bg-ops-accent/80 disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-accent bg-transparent px-6 py-3 font-display text-[14px] uppercase tracking-wider text-ops-accent transition-colors duration-150 hover:bg-ops-accent hover:text-ops-background active:bg-ops-accent/90 disabled:opacity-50"
           >
-            Submit {typeLabel}
+            SUBMIT {typeLabel.toUpperCase()}
           </button>
         )}
       </div>

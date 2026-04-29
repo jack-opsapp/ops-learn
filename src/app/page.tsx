@@ -15,10 +15,10 @@ export default async function CourseCatalog() {
       <main className="relative z-10">
         {/* Hero */}
         <section className="relative min-h-[60vh] flex flex-col justify-end px-6 pb-16 md:px-10 lg:px-24">
-          {/* Gradient base — matches ops-site Hero */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0f0f0f] via-ops-background to-[#060606]" />
+          {/* Gradient base — pure-black canvas, soft top sheen */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[rgba(255,255,255,0.04)] via-ops-background to-ops-background" />
           {/* Bottom fade */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ops-background/80 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ops-background via-transparent to-transparent" />
           {/* Noise texture */}
           <div className="absolute inset-0 opacity-[0.03]">
             <svg className="h-full w-full">
@@ -30,25 +30,25 @@ export default async function CourseCatalog() {
           </div>
 
           <div className="relative max-w-[1400px] mx-auto w-full">
-            <p className="font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4">
-              [ OPS Learn ]
+            <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute mb-4">
+              // OPS LEARN
             </p>
             <h1
-              className="font-heading font-bold uppercase text-ops-text-primary"
+              className="font-display font-light uppercase text-ops-text-primary"
               style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', lineHeight: 1.05 }}
             >
               Learn to build a business
               <br />
-              <span className="text-ops-accent">that works without you.</span>
+              <span className="text-ops-text-secondary">that works without you.</span>
             </h1>
-            <p className="mt-5 max-w-xl font-body text-lg font-light text-ops-text-secondary md:text-xl">
+            <p className="mt-5 max-w-xl font-body text-lg text-ops-text-secondary md:text-xl">
               Free and premium courses for service business owners, operators, and
               anyone ready to stop trading time for money.
             </p>
 
             {/* Trust line */}
-            <p className="mt-6 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
-              Start free &middot; No account required &middot; Built by OPS
+            <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+              START FREE · NO ACCOUNT REQUIRED · BUILT BY OPS
             </p>
           </div>
         </section>
@@ -57,8 +57,8 @@ export default async function CourseCatalog() {
         {freeCourses.length > 0 && (
           <section id="free" className="mx-auto max-w-[1400px] px-6 py-16 md:px-10">
             <div className="mb-8 flex items-center gap-4">
-              <p className="font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-                [ Free Courses ]
+              <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+                // FREE COURSES
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -91,8 +91,8 @@ export default async function CourseCatalog() {
         {/* Paid Courses */}
         {paidCourses.length > 0 && (
           <section id="premium" className="mx-auto max-w-[1400px] px-6 py-16 md:px-10">
-            <p className="mb-8 font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-              [ Premium Courses ]
+            <p className="mb-8 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+              // PREMIUM COURSES
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {paidCourses.map((course) => (
@@ -124,15 +124,14 @@ export default async function CourseCatalog() {
         {/* Empty state */}
         {courses.length === 0 && (
           <section className="flex flex-col items-center justify-center px-6 py-32 text-center">
-            <span className="font-heading text-6xl font-bold text-white/[0.06]">
+            <span className="font-display text-6xl font-light tracking-wider text-white/[0.06]" aria-hidden="true">
               OPS
             </span>
-            <h2 className="mt-6 font-heading text-2xl font-medium text-ops-text-primary">
-              Courses coming soon
+            <h2 className="mt-6 font-display text-2xl font-light uppercase text-ops-text-primary">
+              COURSES COMING SOON
             </h2>
-            <p className="mt-3 max-w-md font-body text-sm font-light text-ops-text-secondary">
-              We&apos;re building something great. Check back soon for free and premium
-              courses to help you run your business better.
+            <p className="mt-3 max-w-md font-body text-sm text-ops-text-secondary">
+              Free and premium courses are in production. Check back soon.
             </p>
           </section>
         )}

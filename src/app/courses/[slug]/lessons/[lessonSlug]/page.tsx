@@ -127,24 +127,28 @@ export default async function LessonPage({
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Top bar (mobile) */}
-        <div className="flex items-center gap-3 border-b border-ops-border px-6 py-4 lg:hidden">
+        <div className="flex min-h-[56px] items-center gap-3 border-b border-ops-border px-6 py-4 lg:hidden">
           <Link
             href={`/courses/${slug}`}
-            className="text-ops-text-secondary transition-colors hover:text-ops-text-primary"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-ops-text-secondary transition-colors duration-150 hover:text-ops-text-primary"
+            aria-label="Back to course"
           >
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </Link>
-          <div className="flex-1">
-            <p className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
-              {currentModuleTitle}
+          <div className="flex-1 min-w-0">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+              {`// ${currentModuleTitle.toUpperCase()}`}
             </p>
             <p className="truncate font-heading text-sm font-medium text-ops-text-primary">
               {currentLesson.title}
             </p>
           </div>
-          <span className="font-caption text-[10px] tracking-[0.1em] text-ops-text-secondary">
+          <span
+            className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary"
+            style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}
+          >
             {currentIdx + 1}/{allItems.length}
           </span>
         </div>

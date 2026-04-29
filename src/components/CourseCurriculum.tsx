@@ -77,14 +77,14 @@ export default function CourseCurriculum({
         return (
           <div
             key={module.id}
-            className="overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface transition-[border-color] duration-300 hover:border-ops-border-hover"
+            className="glass-surface overflow-hidden transition-colors duration-150 hover:border-ops-border-hover"
           >
             {/* Module header */}
             <button
               onClick={() => toggleModule(module.id)}
               className="flex w-full items-center gap-4 px-6 py-5 text-left cursor-pointer"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ops-border font-caption text-[10px] text-ops-text-secondary">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ops-border font-caption text-[11px] text-ops-text-secondary">
                 {moduleIdx + 1}
               </span>
               <div className="flex-1 min-w-0">
@@ -92,23 +92,23 @@ export default function CourseCurriculum({
                   {module.title}
                 </h3>
                 {module.description && (
-                  <p className="mt-0.5 font-body text-xs font-light text-ops-text-secondary line-clamp-1">
+                  <p className="mt-0.5 font-body text-xs font-normal text-ops-text-secondary line-clamp-1">
                     {module.description}
                   </p>
                 )}
               </div>
               {showAccessBadge && (
                 hasPreviewLessons ? (
-                  <span className="shrink-0 rounded-[3px] border border-ops-accent/30 px-2.5 py-1 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+                  <span className="shrink-0 rounded-[5px] border border-ops-border px-2.5 py-1 font-caption text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                     Preview
                   </span>
                 ) : (
-                  <span className="shrink-0 rounded-[3px] border border-ops-border px-2.5 py-1 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-text-secondary/50">
+                  <span className="shrink-0 rounded-[5px] border border-ops-border px-2.5 py-1 font-caption text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                     {isFree || enrolled === 'purchased' ? 'Add Course to Unlock' : 'Buy to Unlock'}
                   </span>
                 )
               )}
-              <span className="shrink-0 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary mr-2">
+              <span className="shrink-0 font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary mr-2">
                 {lessons.length} lessons{assessments.length > 0 ? ` · ${assessments.length} assessments` : ''}
               </span>
               <svg
@@ -142,7 +142,7 @@ export default function CourseCurriculum({
                 >
                   {module.description && (
                     <div className="border-t border-ops-border px-6 py-4">
-                      <p className="font-body text-sm font-light leading-relaxed text-ops-text-secondary">
+                      <p className="font-body text-sm font-normal leading-relaxed text-ops-text-secondary">
                         {module.description}
                       </p>
                     </div>
@@ -159,7 +159,7 @@ export default function CourseCurriculum({
                           return (
                             <div key={item.id} className="px-6 py-4">
                               <div className="flex items-start gap-4">
-                                <span className="mt-0.5 shrink-0 font-caption text-[10px] text-ops-text-secondary">
+                                <span className="mt-0.5 shrink-0 font-caption text-[11px] text-ops-text-secondary">
                                   {moduleIdx + 1}.{lessonIdx}
                                 </span>
                                 <div className="flex-1 min-w-0">
@@ -168,14 +168,14 @@ export default function CourseCurriculum({
                                       {item.title}
                                     </span>
                                     {item.is_preview && !isFree && enrolled !== true && (
-                                      <span className="rounded-[3px] border border-ops-accent/30 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+                                      <span className="rounded-[5px] border border-ops-border px-2 py-0.5 font-caption text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                                         Preview
                                       </span>
                                     )}
                                   </div>
                                 </div>
                                 {item.duration_minutes && (
-                                  <span className="mt-0.5 shrink-0 font-caption text-[10px] text-ops-text-secondary">
+                                  <span className="mt-0.5 shrink-0 font-caption text-[11px] text-ops-text-secondary">
                                     {item.duration_minutes} min
                                   </span>
                                 )}
@@ -185,7 +185,7 @@ export default function CourseCurriculum({
                                 <div className="mt-3 ml-8">
                                   <Link
                                     href={`/courses/${courseSlug}/lessons/${item.slug}`}
-                                    className="inline-flex items-center gap-2 rounded-[3px] border border-ops-border px-4 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary transition-all hover:border-ops-border-hover hover:text-ops-text-primary"
+                                    className="inline-flex items-center gap-2 rounded-[5px] border border-ops-border px-4 py-2 font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary transition-all hover:border-ops-border-hover hover:text-ops-text-primary"
                                   >
                                     {enrolled === true ? 'Go to Lesson' : 'Preview Lesson'}
                                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
@@ -198,19 +198,19 @@ export default function CourseCurriculum({
                                   {enrolled === null ? (
                                     <a
                                       href={`/auth/login?next=/courses/${courseSlug}`}
-                                      className="inline-flex items-center gap-2 rounded-[3px] bg-ops-text-primary px-4 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-background transition-all hover:bg-white/90"
+                                      className="inline-flex items-center gap-2 rounded-[5px] bg-ops-text-primary px-4 py-2 font-caption text-[11px] uppercase tracking-wider text-ops-background transition-all hover:bg-white/90"
                                     >
                                       Sign In to Access
                                     </a>
                                   ) : isFree || enrolled === 'purchased' ? (
-                                    <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/40">
+                                    <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-mute">
                                       Add course to access
                                     </span>
                                   ) : (
                                     <button
                                       onClick={handleBuy}
                                       disabled={buyLoading}
-                                      className="inline-flex items-center gap-2 rounded-[3px] bg-ops-text-primary px-4 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-background transition-all hover:bg-white/90 disabled:opacity-50 cursor-pointer"
+                                      className="inline-flex items-center gap-2 rounded-[5px] bg-ops-text-primary px-4 py-2 font-caption text-[11px] uppercase tracking-wider text-ops-background transition-all hover:bg-white/90 disabled:opacity-50 cursor-pointer"
                                     >
                                       <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                                         <rect x="2" y="5" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.2" />
@@ -235,20 +235,20 @@ export default function CourseCurriculum({
                             <div className="flex items-start gap-4">
                               <span className="mt-0.5 shrink-0">
                                 {item.type === 'quiz' && (
-                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-accent">
+                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-text-tertiary">
                                     <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.2" />
                                     <path d="M6.5 6.5a1.5 1.5 0 1 1 1.5 1.5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                                     <circle cx="8" cy="11" r="0.5" fill="currentColor" />
                                   </svg>
                                 )}
                                 {item.type === 'assignment' && (
-                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-accent">
+                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-text-tertiary">
                                     <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" />
                                     <path d="M6 5.5h4M6 8h4M6 10.5h2.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                                   </svg>
                                 )}
                                 {item.type === 'test' && (
-                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-accent">
+                                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-ops-text-tertiary">
                                     <path d="M8 1.5L14 5v6l-6 3.5L2 11V5l6-3.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
                                     <path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                                   </svg>
@@ -259,12 +259,12 @@ export default function CourseCurriculum({
                                   <span className={`font-body text-sm ${item.type === 'test' ? 'font-normal text-ops-text-primary' : 'text-ops-text-primary'}`}>
                                     {item.title}
                                   </span>
-                                  <span className="rounded-[3px] border border-ops-accent/20 px-2 py-0.5 font-caption text-[9px] uppercase tracking-[0.1em] text-ops-accent">
+                                  <span className="rounded-[5px] border border-ops-border px-2 py-0.5 font-caption text-[11px] uppercase tracking-wider text-ops-text-tertiary">
                                     {typeLabel}
                                   </span>
                                 </div>
                                 {item.description && (
-                                  <p className="mt-1 font-body text-xs font-light leading-relaxed text-ops-text-secondary/70">
+                                  <p className="mt-1 font-body text-xs font-normal leading-relaxed text-ops-text-tertiary">
                                     {item.description}
                                   </p>
                                 )}
@@ -275,7 +275,7 @@ export default function CourseCurriculum({
                               <div className="mt-3 ml-8">
                                 <Link
                                   href={`/courses/${courseSlug}/assessments/${item.slug}`}
-                                  className="inline-flex items-center gap-2 rounded-[3px] border border-ops-border px-4 py-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary transition-all hover:border-ops-border-hover hover:text-ops-text-primary"
+                                  className="inline-flex items-center gap-2 rounded-[5px] border border-ops-border px-4 py-2 font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary transition-all hover:border-ops-border-hover hover:text-ops-text-primary"
                                 >
                                   Start {typeLabel}
                                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
@@ -285,7 +285,7 @@ export default function CourseCurriculum({
                               </div>
                             ) : (
                               <div className="mt-3 ml-8">
-                                <span className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary/40">
+                                <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-mute">
                                   Add course to access
                                 </span>
                               </div>
@@ -303,7 +303,7 @@ export default function CourseCurriculum({
       })}
 
       {buyError && (
-        <p className="font-body text-sm text-red-400">{buyError}</p>
+        <p className="font-body text-sm text-ops-rose">{buyError}</p>
       )}
     </div>
   );

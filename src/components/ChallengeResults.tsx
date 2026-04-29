@@ -74,28 +74,28 @@ export default function ChallengeResults({
     <div>
       {/* Score hero */}
       <div className="mb-10 text-center">
-        <p className="font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-          Your Score
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+          // YOUR SCORE
         </p>
         <p
-          className="mt-2 font-heading font-bold text-ops-text-primary"
-          style={{ fontSize: 'clamp(3rem, 8vw, 5rem)', lineHeight: 1 }}
+          className="mt-2 font-mono font-light text-ops-text-primary"
+          style={{ fontSize: 'clamp(3rem, 8vw, 5rem)', lineHeight: 1, fontFeatureSettings: '"tnum" 1, "zero" 1' }}
         >
           {score}%
         </p>
-        <p className="mt-3 font-body text-base font-light text-ops-text-secondary">
+        <p className="mt-3 font-body text-base text-ops-text-secondary">
           {tierMessage}
         </p>
       </div>
 
       {/* Discount CTA */}
       {discountPercentage > 0 && (
-        <div className="mb-10 rounded-[3px] border border-ops-accent/30 bg-ops-accent/5 p-6 text-center">
-          <p className="font-caption text-[11px] uppercase tracking-[0.2em] text-ops-accent">
-            You earned {discountPercentage}% off
+        <div className="glass-surface mb-10 p-6 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+            {`// EARNED ${discountPercentage}% OFF`}
           </p>
-          <p className="mt-1 font-heading text-2xl font-bold text-ops-text-primary">
-            <span className="text-ops-text-secondary/40 line-through">
+          <p className="mt-1 font-mono text-2xl font-medium text-ops-text-primary" style={{ fontFeatureSettings: '"tnum" 1, "zero" 1' }}>
+            <span className="text-ops-text-mute line-through">
               ${(priceCents / 100).toFixed(0)}
             </span>{' '}
             ${(discountedPrice / 100).toFixed(0)}
@@ -103,46 +103,46 @@ export default function ChallengeResults({
           <button
             onClick={handleBuyWithDiscount}
             disabled={buyLoading}
-            className="mt-4 inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-text-primary px-8 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80 disabled:opacity-50"
+            className="mt-4 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-accent bg-transparent px-8 py-3 font-display text-[14px] uppercase tracking-wider text-ops-accent transition-colors duration-150 hover:bg-ops-accent hover:text-ops-background disabled:opacity-50"
           >
-            {buyLoading ? 'Redirecting...' : `Buy Course — $${(discountedPrice / 100).toFixed(0)}`}
+            {buyLoading ? 'REDIRECTING…' : `BUY COURSE — $${(discountedPrice / 100).toFixed(0)}`}
           </button>
-          {buyError && <p className="mt-2 font-body text-sm text-red-400">{buyError}</p>}
+          {buyError && <p className="mt-2 font-body text-sm text-ops-rose">{buyError}</p>}
         </div>
       )}
 
       {/* Per-question feedback */}
       <div className="flex flex-col gap-4">
-        <p className="font-caption text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary">
-          [ Question Breakdown ]
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+          // QUESTION BREAKDOWN
         </p>
         {feedback.map((fb, idx) => {
           const question = questions.find((q) => q.id === fb.questionId);
+          const fullCredit = fb.score === fb.maxPoints;
+          const partial = fb.score > 0 && !fullCredit;
+          const badgeStyle = fullCredit
+            ? { color: '#9DB582', background: 'rgba(157,181,130,0.12)', border: '1px solid rgba(157,181,130,0.30)' }
+            : partial
+              ? { color: '#C4A868', background: 'rgba(196,168,104,0.12)', border: '1px solid rgba(196,168,104,0.30)' }
+              : { color: '#B58289', background: 'rgba(181,130,137,0.12)', border: '1px solid rgba(181,130,137,0.30)' };
+
           return (
-            <div
-              key={fb.questionId}
-              className="rounded-[3px] border border-ops-border bg-ops-surface p-5"
-            >
+            <div key={fb.questionId} className="glass-surface p-5">
               <div className="flex items-start justify-between gap-4">
                 <p className="font-body text-sm text-ops-text-primary">
-                  <span className="mr-2 font-caption text-[10px] text-ops-text-secondary">
+                  <span className="mr-2 font-mono text-[11px] text-ops-text-tertiary">
                     Q{idx + 1}
                   </span>
                   {question?.question}
                 </p>
                 <span
-                  className={`shrink-0 rounded-[3px] px-2 py-0.5 font-caption text-[10px] uppercase tracking-[0.1em] ${
-                    fb.score === fb.maxPoints
-                      ? 'bg-emerald-500/10 text-emerald-400'
-                      : fb.score > 0
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'bg-red-500/10 text-red-400'
-                  }`}
+                  className="shrink-0 rounded-[4px] px-2 py-[2px] font-mono text-[11px] uppercase tracking-wider"
+                  style={{ ...badgeStyle, fontFeatureSettings: '"tnum" 1, "zero" 1' }}
                 >
                   {fb.score}/{fb.maxPoints}
                 </span>
               </div>
-              <p className="mt-2 font-body text-xs font-light leading-relaxed text-ops-text-secondary">
+              <p className="mt-2 font-body text-xs leading-relaxed text-ops-text-secondary">
                 {fb.feedback}
               </p>
             </div>
@@ -154,9 +154,9 @@ export default function ChallengeResults({
       <div className="mt-8">
         <a
           href={`/courses/${courseSlug}`}
-          className="font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary transition-colors hover:text-ops-text-primary"
+          className="inline-flex min-h-[44px] items-center font-mono text-[11px] uppercase tracking-wider text-ops-text-secondary transition-colors duration-150 hover:text-ops-text-primary"
         >
-          &larr; Back to Course
+          ← BACK TO COURSE
         </a>
       </div>
     </div>

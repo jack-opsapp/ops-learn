@@ -13,7 +13,7 @@ interface EnrollButtonProps {
 }
 
 const BTN =
-  'inline-flex items-center justify-center gap-2 rounded-[3px] bg-ops-text-primary px-6 py-3 font-caption text-xs uppercase tracking-[0.15em] text-ops-background transition-all duration-200 hover:bg-white/90 active:bg-white/80 disabled:opacity-50';
+  'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-accent bg-transparent px-6 py-3 font-display text-[14px] uppercase tracking-wider text-ops-accent transition-colors duration-150 hover:bg-ops-accent hover:text-ops-background disabled:opacity-50';
 
 export default function EnrollButton({
   courseId,
@@ -34,7 +34,7 @@ export default function EnrollButton({
         href={`/auth/login?next=/courses/${courseSlug}`}
         className={BTN}
       >
-        {isFree ? 'Sign In to Add Course' : 'Sign In to Purchase'}
+        {isFree ? 'SIGN IN TO ADD COURSE' : 'SIGN IN TO PURCHASE'}
       </a>
     );
   }
@@ -46,8 +46,8 @@ export default function EnrollButton({
         href={firstLessonSlug ? `/courses/${courseSlug}/lessons/${firstLessonSlug}` : '#'}
         className={BTN}
       >
-        Continue Course
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        CONTINUE COURSE
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </a>
@@ -79,9 +79,9 @@ export default function EnrollButton({
     return (
       <div>
         <button onClick={handleAddCourse} disabled={loading} className={BTN}>
-          {loading ? 'Adding...' : 'Add Course'}
+          {loading ? 'ADDING…' : 'ADD COURSE'}
         </button>
-        {error && <p className="mt-2 font-body text-sm text-red-400">{error}</p>}
+        {error && <p className="mt-2 font-body text-sm text-ops-rose">{error}</p>}
       </div>
     );
   }
@@ -117,9 +117,9 @@ export default function EnrollButton({
   return (
     <div>
       <button onClick={handleBuy} disabled={loading} className={BTN}>
-        {loading ? 'Redirecting...' : `Buy Course — $${(priceCents / 100).toFixed(0)}`}
+        {loading ? 'REDIRECTING…' : `BUY COURSE — $${(priceCents / 100).toFixed(0)}`}
       </button>
-      {error && <p className="mt-2 font-body text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-2 font-body text-sm text-ops-rose">{error}</p>}
     </div>
   );
 }

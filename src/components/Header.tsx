@@ -55,46 +55,46 @@ export default function Header() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-150 ${
         scrolled
-          ? 'border-b border-white/[0.08]'
+          ? 'border-b border-white/[0.09]'
           : 'bg-transparent border-b border-transparent'
       }`}
       style={
         scrolled
           ? {
-              background: 'rgba(10, 10, 10, 0.70)',
-              backdropFilter: 'blur(20px) saturate(1.2)',
-              WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
+              background: 'rgba(18, 18, 20, 0.78)',
+              backdropFilter: 'blur(28px) saturate(1.3)',
+              WebkitBackdropFilter: 'blur(28px) saturate(1.3)',
             }
           : undefined
       }
     >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-6 md:px-10">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <span className="font-heading text-xl font-bold tracking-wide text-ops-text-primary">
+        <Link href="/" className="flex min-h-[44px] items-center gap-3">
+          <span className="font-display text-[20px] font-light tracking-wider text-ops-text-primary">
             OPS
           </span>
-          <span className="font-caption uppercase tracking-[0.15em] text-[11px] text-ops-text-secondary">
-            Learn
+          <span className="font-mono uppercase tracking-wider text-[11px] text-ops-text-tertiary">
+            LEARN
           </span>
         </Link>
 
         {/* Nav links + auth */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Link
             href="/"
-            className="hidden font-caption uppercase tracking-[0.15em] text-[11px] text-ops-text-secondary transition-colors hover:text-ops-text-primary sm:block"
+            className="hidden min-h-[44px] items-center font-display uppercase tracking-wider text-[12px] text-ops-text-secondary transition-colors duration-150 hover:text-ops-text-primary sm:inline-flex"
           >
-            Courses
+            COURSES
           </Link>
 
           {authLoading ? null : user ? (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="font-body text-ops-text-primary text-sm underline underline-offset-4 decoration-ops-border hover:decoration-ops-border-hover transition-colors cursor-pointer"
+                className="min-h-[44px] px-2 font-body text-ops-text-primary text-sm underline underline-offset-4 decoration-ops-border hover:decoration-ops-border-hover transition-colors duration-150 cursor-pointer"
               >
                 {userName}
               </button>
@@ -104,12 +104,12 @@ export default function Header() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute right-0 top-full mt-2 w-48 bg-ops-surface border border-ops-border rounded-[3px] overflow-hidden z-50"
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="glass-dense absolute right-0 top-full mt-2 w-56 overflow-hidden z-50"
                   >
-                    <div className="px-4 py-3 border-b border-ops-border">
-                      <p className="font-caption text-ops-text-secondary uppercase tracking-[0.1em] text-[10px]">
-                        SIGNED IN AS
+                    <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.09)]">
+                      <p className="font-mono text-ops-text-tertiary uppercase tracking-wider text-[11px]">
+                        // OPERATOR
                       </p>
                       <p className="font-body text-ops-text-primary text-sm mt-1 truncate">
                         {userName}
@@ -117,20 +117,20 @@ export default function Header() {
                     </div>
                     <a
                       href="https://app.opsapp.co"
-                      className="block px-4 py-2.5 font-caption text-ops-text-secondary uppercase tracking-[0.1em] text-[11px] hover:bg-ops-surface-elevated hover:text-ops-text-primary transition-colors"
+                      className="block min-h-[44px] px-4 py-3 font-display text-ops-text-secondary uppercase tracking-wider text-[12px] hover:bg-[rgba(255,255,255,0.05)] hover:text-ops-text-primary transition-colors duration-150"
                     >
                       OPS DASHBOARD
                     </a>
                     <Link
                       href="/my-courses"
                       onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2.5 font-caption text-ops-text-secondary uppercase tracking-[0.1em] text-[11px] hover:bg-ops-surface-elevated hover:text-ops-text-primary transition-colors"
+                      className="block min-h-[44px] px-4 py-3 font-display text-ops-text-secondary uppercase tracking-wider text-[12px] hover:bg-[rgba(255,255,255,0.05)] hover:text-ops-text-primary transition-colors duration-150"
                     >
                       MY COURSES
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2.5 font-caption text-ops-text-secondary uppercase tracking-[0.1em] text-[11px] hover:bg-ops-surface-elevated hover:text-ops-text-primary transition-colors border-t border-ops-border cursor-pointer"
+                      className="block w-full text-left min-h-[44px] px-4 py-3 font-display text-ops-text-secondary uppercase tracking-wider text-[12px] hover:bg-[rgba(255,255,255,0.05)] hover:text-ops-text-primary transition-colors duration-150 border-t border-[rgba(255,255,255,0.09)] cursor-pointer"
                     >
                       SIGN OUT
                     </button>
@@ -141,9 +141,9 @@ export default function Header() {
           ) : (
             <Link
               href="/auth/login"
-              className="inline-flex items-center justify-center font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-transparent text-ops-text-primary border border-ops-border hover:border-ops-border-hover active:border-white/40"
+              className="inline-flex min-h-[44px] items-center justify-center font-display uppercase tracking-wider text-[14px] px-6 py-2 rounded-[5px] transition-colors duration-150 bg-transparent text-ops-text-primary border border-ops-border hover:border-ops-border-hover hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)]"
             >
-              Sign In
+              SIGN IN
             </Link>
           )}
         </div>

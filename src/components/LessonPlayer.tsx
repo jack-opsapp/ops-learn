@@ -48,7 +48,7 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
   switch (block.type) {
     case 'video':
       return (
-        <div className="aspect-video w-full overflow-hidden rounded-[3px] border border-ops-border bg-ops-surface">
+        <div className="glass-surface aspect-video w-full overflow-hidden">
           {content.url ? (
             <video
               src={content.url}
@@ -71,7 +71,7 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
+              <span className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
                 Video coming soon
               </span>
             </div>
@@ -95,9 +95,9 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
         <a
           href={content.url}
           download
-          className="group flex items-center gap-4 rounded-[3px] border border-ops-border bg-ops-surface p-5 transition-[border-color] duration-300 hover:border-ops-border-hover"
+          className="glass-surface group flex items-center gap-4 p-5 transition-colors duration-150 hover:border-ops-border-hover"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] bg-ops-accent/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[5px] bg-[rgba(255,255,255,0.06)]">
             <svg
               width="18"
               height="18"
@@ -105,7 +105,8 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
-              className="text-ops-accent"
+              className="text-ops-text-secondary"
+              aria-hidden="true"
             >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
@@ -116,7 +117,7 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
             <p className="font-heading text-sm font-medium text-ops-text-primary">
               {content.title ?? 'Download'}
             </p>
-            <p className="mt-0.5 font-body text-xs font-light text-ops-text-secondary">
+            <p className="mt-0.5 font-body text-xs font-normal text-ops-text-secondary">
               {content.description ?? 'Click to download'}
             </p>
           </div>
@@ -125,11 +126,11 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
 
     case 'action_item':
       return (
-        <div className="rounded-[3px] border-l-2 border-ops-accent bg-ops-surface p-5">
-          <p className="mb-1.5 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-accent">
-            Action Item
+        <div className="glass-surface p-5" style={{ borderLeft: '2px solid #6F94B0' }}>
+          <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-ops-text-mute">
+            // ACTION ITEM
           </p>
-          <p className="font-body text-sm font-light leading-relaxed text-ops-text-primary">
+          <p className="font-body text-sm leading-relaxed text-ops-text-primary">
             {content.text}
           </p>
         </div>
@@ -137,11 +138,11 @@ function ContentBlockRenderer({ block, userId }: { block: ContentBlock; userId?:
 
     case 'quiz':
       return (
-        <div className="rounded-[3px] border border-ops-border bg-ops-surface p-5">
-          <p className="mb-2 font-caption text-[10px] uppercase tracking-[0.15em] text-ops-warning">
-            Quick Check
+        <div className="glass-surface p-5">
+          <p className="mb-2 font-mono text-[11px] uppercase tracking-wider text-ops-warning">
+            // QUICK CHECK
           </p>
-          <p className="font-body text-sm font-light text-ops-text-primary">
+          <p className="font-body text-sm text-ops-text-primary">
             {content.question}
           </p>
         </div>
@@ -170,17 +171,17 @@ export default function LessonPlayer({
       <div className="mx-auto max-w-3xl px-6 py-12 md:px-10 lg:py-16">
         {/* Lesson header */}
         <div className="mb-10">
-          <p className="font-caption text-[10px] uppercase tracking-[0.15em] text-ops-text-secondary">
+          <p className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
             {moduleName}
           </p>
           <h1
-            className="mt-2 font-heading font-bold text-ops-text-primary"
+            className="mt-2 font-display font-light uppercase text-ops-text-primary"
             style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}
           >
             {lesson.title}
           </h1>
           {lesson.duration_minutes && (
-            <p className="mt-2 font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+            <p className="mt-2 font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
               {lesson.duration_minutes} min
             </p>
           )}
@@ -193,12 +194,12 @@ export default function LessonPlayer({
               <ContentBlockRenderer key={block.id} block={block} userId={userId} />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center border border-dashed border-ops-border py-20 text-center rounded-[3px]">
-              <span className="font-heading text-3xl font-bold text-white/[0.06]">
+            <div className="glass-surface flex flex-col items-center justify-center py-20 text-center" style={{ borderStyle: 'dashed' }}>
+              <span className="font-display text-3xl font-light tracking-wider text-white/[0.06]" aria-hidden="true">
                 OPS
               </span>
-              <p className="mt-3 font-caption text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary">
-                Content coming soon
+              <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ops-text-tertiary">
+                // CONTENT COMING SOON
               </p>
             </div>
           )}
@@ -221,10 +222,10 @@ export default function LessonPlayer({
                 />
               </svg>
               <div className="text-left">
-                <p className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+                <p className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
                   Previous
                 </p>
-                <p className="font-body text-sm font-light">{prevLesson.title}</p>
+                <p className="font-body text-sm font-normal">{prevLesson.title}</p>
               </div>
             </Link>
           ) : (
@@ -237,10 +238,10 @@ export default function LessonPlayer({
               className="group flex items-center gap-3 text-ops-text-secondary transition-colors hover:text-ops-text-primary"
             >
               <div className="text-right">
-                <p className="font-caption text-[10px] uppercase tracking-[0.1em] text-ops-text-secondary">
+                <p className="font-caption text-[11px] uppercase tracking-wider text-ops-text-secondary">
                   Next
                 </p>
-                <p className="font-body text-sm font-light">{nextLesson.title}</p>
+                <p className="font-body text-sm font-normal">{nextLesson.title}</p>
               </div>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path
@@ -255,10 +256,10 @@ export default function LessonPlayer({
           ) : (
             <Link
               href={`/courses/${courseSlug}`}
-              className="inline-flex items-center justify-center gap-2 font-caption uppercase tracking-[0.15em] text-xs px-6 py-3 rounded-[3px] transition-all duration-200 bg-ops-text-primary text-ops-background hover:bg-white/90 active:bg-white/80"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[5px] border border-ops-accent bg-transparent px-6 py-3 font-display text-[14px] uppercase tracking-wider text-ops-accent transition-colors duration-150 hover:bg-ops-accent hover:text-ops-background"
             >
-              Course Complete
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              COURSE COMPLETE
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <polyline
                   points="9 11 12 14 22 4"
                   stroke="currentColor"
